@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.container > div {
+  width: 50%;
+  height: 100%;
+}
+
+canvas {
+  aspect-ratio: 1;
+}
+
+/* .code {
+  background-color: green;
+}
+
+.canvas {
+  background-color: red;
+} */
