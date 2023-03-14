@@ -9,27 +9,51 @@ class BHT {
     this._k = k;
     this._n = n;
 
+    this._max_addr = 2 ** k;
     this._correct = 0;
     this._incorrect = 0;
 
     this._prediction = new Map();
   }
 
+  /**
+   * Converts the address to a binary string of length k
+   *
+   * @param {integer} x
+   * @returns {string} - The binary string of length k
+   */
   _correctAddressLength(x) {
-    if (x.length < this._k) x = x.padStart(this._k, 0);
-    else if (x.length > this._k) x = x.slice(x.length - this._k);
+    if (x < 0) throw new Error(`address must be a positive integer`);
+    if (x >= this._max_addr) x %= this._max_addr;
 
-    return x;
+    return x.toString(2).padStart(this._k, "0");
   }
 
-  _getPrediction(key) {
-    if (!this._prediction.has(key)) this._prediction.set(key, 0);
-    return this._prediction.get(key);
+  /**
+   * Returns the prediction for the given address.
+   * If the address was not previously seen, it is added to the map with a
+   * prediction of 0.
+   *
+   * @param {integer} address
+   * @returns {boolean}
+   */
+  _getPrediction(address) {
+    if (!this._prediction.has(address)) this._prediction.set(address, 0);
+    return this._prediction.get(address);
   }
 
-  _setPrediction(key, value) {
-    const prediction = this._getPrediction(key);
-    let new_value = prediction + value;
+  /**
+   * Updates the prediction for the given address.
+   * If the prediction is correct, the prediction is incremented by 1.
+   * If the prediction is incorrect, the prediction is decremented by 1.
+   *
+   * @param {integer} address
+   * @param {boolean} outcome
+   * @returns {void}
+   */
+  _setPrediction(address, outcome) {
+    const prediction = this._getPrediction(address);
+    let new_value = prediction + outcome;
 
     if (new_value > this._n) new_value = this._n;
     else if (new_value < 0) new_value = 0;
@@ -37,7 +61,7 @@ class BHT {
     if (this._toBool(new_value) == this._toBool(prediction)) this._correct++;
     else this._incorrect++;
 
-    this._prediction.set(key, new_value);
+    this._prediction.set(address, new_value);
   }
 
   _toBool(value) {
