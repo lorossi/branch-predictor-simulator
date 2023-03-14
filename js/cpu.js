@@ -60,31 +60,36 @@ class CPU {
     const [op1, op2, op3] = instruction.operators;
 
     console.log(instruction.toString());
-    if (opcode === "NOP") {
-      this._registers.inc("PC");
-    } else if (this._alu.operations.includes(opcode)) {
-      this._alu.run(opcode, op1, op2, op3);
-      this._registers.inc("PC");
-    } else if (this._mu.operations.includes(opcode)) {
-      this._mu.run(opcode, op1, op2, op3);
-      this._registers.inc("PC");
-    } else if (this._ju.operations.includes(opcode)) {
-      const prediction = this._cbp.predict(this.pc);
 
+    if (opcode === "nop") {
+      // no operation
+      this._registers.inc("$pc");
+    } else if (this._alu.operations.includes(opcode)) {
+      // arithmetic and logic operations
+      this._alu.run(opcode, op1, op2, op3);
+      this._registers.inc("$pc");
+    } else if (this._mu.operations.includes(opcode)) {
+      // memory operations
+      this._mu.run(opcode, op1, op2, op3);
+      this._registers.inc("$pc");
+    } else if (this._sc.operations.includes(opcode)) {
+      // system calls
+      this._sc.run(opcode, op1, op2, op3);
+      this._registers.inc("$pc");
+    } else if (this._ju.operations.includes(opcode)) {
+      // jumps
+      const prediction = this._cbp.predict(this.pc);
       const jump = this._ju.run(opcode, op1, op2, op3);
       if (jump) {
         const dest = this._findDest(instruction);
-        this._registers.set("PC", this._findLabel(dest));
+        this._registers.set("$pc", this._findLabel(dest));
       } else {
-        this._registers.inc("PC");
+        this._registers.inc("$pc");
       }
 
       console.log(`PC: ${this.pc} Prediction: ${prediction}, Actual: ${jump}`);
 
       this._cbp.update(this.pc, jump);
-    } else if (this._sc.operations.includes(opcode)) {
-      this._sc.run(opcode, op1, op2, op3);
-      this._registers.inc("PC");
     } else {
       throw new Error(`Operation ${opcode} not found`);
     }
@@ -99,14 +104,15 @@ class CPU {
   }
 
   get pc() {
-    return this._registers.get("PC");
+    return this._registers.get("$pc");
   }
 
   get isa() {
     return this._alu.operations
       .concat(this._mu.operations)
       .concat(this._ju.operations)
-      .concat(this._sc.operations);
+      .concat(this._sc.operations)
+      .concat(["NOP"]);
   }
 }
 

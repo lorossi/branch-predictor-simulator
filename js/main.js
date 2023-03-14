@@ -22,19 +22,18 @@ const main = () => {
   resize_canvas();
 
   const instructions = [
-    "MOVI R0 512",
-    "MOVI R1 1",
-    "LOOP: BEQ ZERO R0 END",
-    "SUB R0 R0 R1",
-    "JUMP LOOP",
-    "END: NOP",
+    "li $t0 512",
+    "li $t1 1",
+    "LOOP: beq $zero $t0 END",
+    "sub $t0 $t0 $t1",
+    "jump LOOP",
+    "mov $v0 $t0",
+    "END: print_int",
   ].map((s) => Instruction.fromString(s));
 
   const cpu = new CPU();
   cpu.load(instructions);
   cpu.run();
-  console.log(cpu.registers);
-  console.log(cpu.accuracy);
 };
 
 document.addEventListener("DOMContentLoaded", main);

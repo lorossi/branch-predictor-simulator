@@ -17,22 +17,22 @@ class Registers {
 
     this._registers = new Map();
 
-    this._registers.set("zero", 0);
+    this._registers.set("$zero", 0);
 
-    for (let i = 0; i < 2; i++) this._registers.set(`v${i}`, 0);
+    for (let i = 0; i < 2; i++) this._registers.set(`$v${i}`, 0);
 
-    for (let i = 0; i < 4; i++) this._registers.set(`a${i}`, 0);
+    for (let i = 0; i < 4; i++) this._registers.set(`$a${i}`, 0);
 
-    for (let i = 0; i < 8; i++) this._registers.set(`t${i}`, 0);
+    for (let i = 0; i < 8; i++) this._registers.set(`$t${i}`, 0);
 
-    for (let i = 0; i < 8; i++) this._registers.set(`s${i}`, 0);
+    for (let i = 0; i < 8; i++) this._registers.set(`$s${i}`, 0);
 
-    for (let i = 0; i < 2; i++) this._registers.set(`s${i + 8}`, 0);
+    for (let i = 0; i < 2; i++) this._registers.set(`$s${i + 8}`, 0);
 
-    this._registers.set("RA", 0);
-    this._registers.set("PC", 0);
-    this._registers.set("HI", 0);
-    this._registers.set("LO", 0);
+    this._registers.set("$ra", 0);
+    this._registers.set("$pc", 0);
+    this._registers.set("$hi", 0);
+    this._registers.set("$lo", 0);
   }
 
   inc(reg) {
@@ -68,7 +68,7 @@ class Registers {
   }
 
   get pc() {
-    return this.get("PC");
+    return this.get("$pc");
   }
 }
 
@@ -351,11 +351,13 @@ class SC extends Unit {
   }
 
   _print_int() {
-    console.log(this._registers.get("$a0"));
+    const i = this._registers.get("$a0");
+    console.log(`$v0 = ${i}`);
   }
 
   _print_char() {
-    console.log(String.fromCharCode(this._registers.get("$a0")));
+    const c = this._registers.get("$a0");
+    console.log(`$v0 = ${String.fromCharCode(c)}`);
   }
 
   _read_int() {

@@ -13,7 +13,7 @@ class Instruction {
       return new Instruction(null, null, null, null, label_match[1]);
 
     const matches =
-      /(([a-zA-Z]+):\s*)?(([a-zA-Z]+))?\s*([$a-zA-Z0-9]+)?(\s+([$a-zA-Z0-9]+))?(\s+([$a-zA-Z0-9]+))?/.exec(
+      /(([a-zA-Z_]+):\s*)?(([a-zA-Z_]+))?\s*([$a-zA-Z0-9]+)?(\s+([$a-zA-Z0-9]+))?(\s+([$a-zA-Z0-9]+))?/.exec(
         str
       );
 
