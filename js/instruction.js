@@ -39,7 +39,7 @@ class Instruction {
   _formatOperand(operand) {
     if (operand === undefined) return null;
     if (!isNaN(operand)) return parseInt(operand);
-    return operand.toUpperCase();
+    return operand.toLowerCase();
   }
 
   get label() {
