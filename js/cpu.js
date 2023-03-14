@@ -22,6 +22,8 @@ class CPU {
 
   load(instructions) {
     this._instructions = instructions;
+    this.pc = this._findProgramStart();
+    this._data = this._findData();
     this._labels = this._findAllLabels();
   }
 
@@ -32,10 +34,33 @@ class CPU {
     }
   }
 
+  _findProgramStart() {
+    const index = this._instructions.findIndex((i) => i.opcode === ".text");
+
+    if (index === -1) throw new Error("No .text section found");
+    if (index === this._instructions.length - 1)
+      throw new Error("No instructions found");
+
+    return index + 1;
+  }
+
+  _findData() {
+    let data = [];
+    let index = this._instructions.findIndex((i) => i.opcode === ".data");
+
+    if (index == -1) return data;
+
+    this._instructions
+      .filter((i) => i.hasData)
+      .forEach((i) => {
+        this._registers.setDataByLabel(i.label, i.data);
+      });
+  }
+
   _findAllLabels() {
     let labels = new Map();
     this._instructions.forEach((instruction, i) => {
-      if (instruction.label != undefined) {
+      if (instruction.hasLabel) {
         labels.set(instruction.label, i);
       }
     });
@@ -105,6 +130,10 @@ class CPU {
 
   get pc() {
     return this._registers.get("$pc");
+  }
+
+  set pc(value) {
+    this._registers.set("$pc", value);
   }
 
   get isa() {

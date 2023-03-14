@@ -33,6 +33,9 @@ class Registers {
     this._registers.set("$pc", 0);
     this._registers.set("$hi", 0);
     this._registers.set("$lo", 0);
+
+    this._registers.set("$data", []);
+    this._registers.set("$addr", new Map());
   }
 
   inc(reg) {
@@ -53,8 +56,46 @@ class Registers {
 
   set(reg, value) {
     if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
+    if (reg == "$zero") return;
+    
     const v = Math.floor(value) % this._max_val;
     this._registers.set(reg, v);
+  }
+
+  getDataByLabel(label) {
+    if (!this._registers.get("$addr").has(label))
+      throw new Error(`Label ${label} not found`);
+
+    const addr = this._registers.get("$addr").get(label);
+    return this._registers.get("$data")[addr];
+  }
+
+  getDataByAddress(addr) {
+    if (addr >= this._registers.get("$data").length)
+      throw new Error(`Address ${addr} not found`);
+
+    return this._registers.get("$data")[addr];
+  }
+
+  setDataByLabel(label, data) {
+    const addr = this._registers.get("$data").length;
+    this._registers.get("$data").push(...data);
+    this._registers.get("$addr").set(label, addr);
+    return addr;
+  }
+
+  setDataByAddress(addr, data) {
+    if (addr >= this._registers.get("$data").length)
+      throw new Error(`Address ${addr} not found`);
+
+    this._registers.get("$data")[addr] = data;
+  }
+
+  getAddressByLabel(label) {
+    if (!this._registers.get("$addr").has(label))
+      throw new Error(`Label ${label} not found`);
+
+    return this._registers.get("$addr").get(label);
   }
 
   get registers() {
@@ -238,24 +279,36 @@ class MU extends Unit {
     this._operations.set("lw", this._lw);
     this._operations.set("sw", this._sw);
     this._operations.set("li", this._li);
+    this._operations.set("la", this._la);
     this._operations.set("lui", this._lui);
     this._operations.set("mfhi", this._mfhi);
     this._operations.set("mflo", this._mflo);
     this._operations.set("move", this._move);
   }
 
-  _lw(op1, op2) {
+  _lw(op1, imm, op2) {
     const v2 = this._registers.get(op2);
-    this._registers.set(op1, v2);
+    const address = Math.floor(v2 / 4 + imm);
+    const data = this._registers.getDataByAddress(address);
+
+    this._registers.set(op1, data);
   }
 
-  _sw(op1, op2) {
+  _sw(op1, imm, op3) {
     const v1 = this._registers.get(op1);
-    this._registers.set(op2, v1);
+    const v3 = this._registers.get(op3);
+    const address = Math.floor(v3 / 4 + imm);
+
+    this._registers.setDataByAddress(address, v1);
   }
 
   _li(op1, v1) {
     this._registers.set(op1, v1);
+  }
+
+  _la(op1, label) {
+    const address = this._registers.getAddressByLabel(label);
+    this._registers.set(op1, address);
   }
 
   _lui(op1, v1) {

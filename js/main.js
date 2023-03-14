@@ -21,19 +21,15 @@ const main = () => {
   window.addEventListener("resize", resize_canvas);
   resize_canvas();
 
-  const instructions = [
-    "li $t0 512",
-    "li $t1 1",
-    "LOOP: beq $zero $t0 END",
-    "sub $t0 $t0 $t1",
-    "jump LOOP",
-    "mov $v0 $t0",
-    "END: print_int",
-  ].map((s) => Instruction.fromString(s));
+  const instructions = [".data", "b: .space 100", ".text", "nop"].map((s) =>
+    Instruction.fromString(s)
+  );
 
   const cpu = new CPU();
   cpu.load(instructions);
+  console.log(instructions);
   cpu.run();
+  console.log(cpu.registers);
 };
 
 document.addEventListener("DOMContentLoaded", main);
