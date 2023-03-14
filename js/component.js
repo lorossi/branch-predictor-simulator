@@ -2,7 +2,7 @@
  * @class Registers
  *
  * @param {number} k - Number of registers
- * @param {number} n - Size of the registers
+ * @param {number} n - Size of the registers (in bits)
  *
  * @description
  * This class represents the registers of the CPU.
@@ -11,30 +11,48 @@
  */
 class Registers {
   constructor(k = 8, n = 8) {
+    this._k = k;
     this._n = n;
     this._max_val = 2 ** n - 1;
 
     this._registers = new Map();
-    for (let i = 0; i < k; i++) this._registers.set(`R${i}`, 0);
-    this._registers.set("PC", 0);
-    this._registers.set("ZERO", 0);
-  }
 
-  get(reg) {
-    return this._registers.get(reg);
+    this._registers.set("zero", 0);
+
+    for (let i = 0; i < 2; i++) this._registers.set(`v${i}`, 0);
+
+    for (let i = 0; i < 4; i++) this._registers.set(`a${i}`, 0);
+
+    for (let i = 0; i < 8; i++) this._registers.set(`t${i}`, 0);
+
+    for (let i = 0; i < 8; i++) this._registers.set(`s${i}`, 0);
+
+    for (let i = 0; i < 2; i++) this._registers.set(`s${i + 8}`, 0);
+
+    this._registers.set("RA", 0);
+    this._registers.set("PC", 0);
+    this._registers.set("HI", 0);
+    this._registers.set("LO", 0);
   }
 
   inc(reg) {
     const v = this._registers.get(reg) + 1;
-    this._registers.set(reg, v);
+    this.set(reg, v);
   }
 
   dec(reg) {
-    const v = this._registers.get(reg) - 1;
-    this._registers.set(reg, v);
+    const v = this.get(reg) - 1;
+    this.set(reg, v);
+  }
+
+  get(reg) {
+    if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
+
+    return this._registers.get(reg);
   }
 
   set(reg, value) {
+    if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
     const v = Math.floor(value) % this._max_val;
     this._registers.set(reg, v);
   }
@@ -43,6 +61,14 @@ class Registers {
     let registers = {};
     for (let [key, value] of this._registers) registers[key] = value;
     return registers;
+  }
+
+  get k() {
+    return this._k;
+  }
+
+  get pc() {
+    return this.get("PC");
   }
 }
 
@@ -57,7 +83,7 @@ class Registers {
  * @description
  * This class represents a unit of the CPU.
  * It is an abstract class and cannot be instantiated.
- * It is extended by the ALU, MU and JU classes.
+ * It is extended by the ALU, MU, JU, and SC classes.
  *
  *
  */
@@ -91,19 +117,23 @@ class ALU extends Unit {
   constructor(registers) {
     super(registers);
 
-    this._operations.set("ADD", this._add);
-    this._operations.set("SUB", this._sub);
-    this._operations.set("MUL", this._mul);
-    this._operations.set("DIV", this._div);
-    this._operations.set("MOD", this._mod);
-    this._operations.set("AND", this._and);
-    this._operations.set("OR", this._or);
-    this._operations.set("XOR", this._xor);
-    this._operations.set("NOT", this._not);
-    this._operations.set("ADDI", this._addi);
-    this._operations.set("SUBI", this._subi);
-    this._operations.set("MULI", this._muli);
-    this._operations.set("DIVI", this._divi);
+    this._operations.set("add", this._add);
+    this._operations.set("sub", this._sub);
+    this._operations.set("addi", this._addi);
+    this._operations.set("subi", this._subi);
+    this._operations.set("mul", this._mul);
+    this._operations.set("mult", this._mult);
+    this._operations.set("div", this._div);
+
+    this._operations.set("and", this._and);
+    this._operations.set("or", this._or);
+    this._operations.set("andi", this._andi);
+    this._operations.set("ori", this._ori);
+    this._operations.set("sll", this._sll);
+    this._operations.set("srl", this._srl);
+
+    this._operations.set("slt", this._slt);
+    this._operations.set("slti", this._slti);
   }
 
   _add(op1, op2, op3) {
@@ -118,22 +148,34 @@ class ALU extends Unit {
     this._registers.set(op1, v1 - v2);
   }
 
+  _addi(op1, imm) {
+    const v1 = this._registers.get(op1);
+    this._registers.set(op1, v1 + imm);
+  }
+
+  _subi(op1, imm) {
+    const v1 = this._registers.get(op1);
+    this._registers.set(op1, v1 - imm);
+  }
+
   _mul(op1, op2, op3) {
     const v1 = this._registers.get(op2);
     const v2 = this._registers.get(op3);
     this._registers.set(op1, v1 * v2);
   }
 
+  _mult(op1, op2) {
+    const v1 = this._registers.get(op1);
+    const v2 = this._registers.get(op2);
+    const result = v1 * v2;
+    this._registers.set("HI", Math.floor(result / 2 ** this._n));
+    this._registers.set("LO", result % 2 ** this._n);
+  }
+
   _div(op1, op2, op3) {
     const v1 = this._registers.get(op2);
     const v2 = this._registers.get(op3);
     this._registers.set(op1, v1 / v2);
-  }
-
-  _mod(op1, op2, op3) {
-    const v1 = this._registers.get(op2);
-    const v2 = this._registers.get(op3);
-    this._registers.set(op1, v1 % v2);
   }
 
   _and(op1, op2, op3) {
@@ -148,35 +190,37 @@ class ALU extends Unit {
     this._registers.set(op1, v1 | v2);
   }
 
-  _xor(op1, op2, op3) {
+  _andi(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 & imm);
+  }
+
+  _ori(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 | imm);
+  }
+
+  _sll(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 << imm);
+  }
+
+  _srl(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 >> imm);
+  }
+
+  _slt(op1, op2, op3) {
     const v1 = this._registers.get(op2);
     const v2 = this._registers.get(op3);
-    this._registers.set(op1, v1 ^ v2);
+    const result = v1 < v2 ? 1 : 0;
+    this._registers.set(op1, result);
   }
 
-  _not(op1, op2) {
-    const v1 = this._registers.get(op2);
-    this._registers.set(op1, ~v1);
-  }
-
-  _addi(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 + imm);
-  }
-
-  _subi(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 - imm);
-  }
-
-  _muli(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 * imm);
-  }
-
-  _divi(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 / imm);
+  _slti(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    const result = v2 < imm ? 1 : 0;
+    this._registers.set(op1, result);
   }
 }
 
@@ -191,9 +235,13 @@ class MU extends Unit {
   constructor(registers) {
     super(registers);
 
-    this._operations.set("LW", this._lw);
-    this._operations.set("SW", this._sw);
-    this._operations.set("MOVI", this._movi);
+    this._operations.set("lw", this._lw);
+    this._operations.set("sw", this._sw);
+    this._operations.set("li", this._li);
+    this._operations.set("lui", this._lui);
+    this._operations.set("mfhi", this._mfhi);
+    this._operations.set("mflo", this._mflo);
+    this._operations.set("move", this._move);
   }
 
   _lw(op1, op2) {
@@ -206,8 +254,27 @@ class MU extends Unit {
     this._registers.set(op2, v1);
   }
 
-  _movi(op1, v1) {
+  _li(op1, v1) {
     this._registers.set(op1, v1);
+  }
+
+  _lui(op1, v1) {
+    this._registers.set(op1, v1 << (this._registers.k / 2));
+  }
+
+  _mfhi(op1) {
+    const v1 = this._registers.get("HI");
+    this._registers.set(op1, v1);
+  }
+
+  _mflo(op1) {
+    const v1 = this._registers.get("LO");
+    this._registers.set(op1, v1);
+  }
+
+  _move(op1, op2) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2);
   }
 }
 
@@ -222,13 +289,13 @@ class JU extends Unit {
   constructor(registers) {
     super(registers);
 
-    this._operations.set("BEQ", this._beq);
-    this._operations.set("BNE", this._bne);
-    this._operations.set("BGT", this._bgt);
-    this._operations.set("BGE", this._bge);
-    this._operations.set("BLT", this._blt);
-    this._operations.set("BLE", this._ble);
-    this._operations.set("JUMP", this._jmp);
+    this._operations.set("beq", this._beq);
+    this._operations.set("bne", this._bne);
+    this._operations.set("bgt", this._bgt);
+    this._operations.set("bge", this._bge);
+    this._operations.set("blt", this._blt);
+    this._operations.set("ble", this._ble);
+    this._operations.set("jump", this._jmp);
   }
 
   _beq(op1, op2) {
@@ -272,4 +339,38 @@ class JU extends Unit {
   }
 }
 
-export { Registers, ALU, MU, JU };
+class SC extends Unit {
+  constructor(registers) {
+    super(registers);
+
+    this._operations.set("print_int", this._print_int);
+    this._operations.set("print_char", this._print_char);
+    this._operations.set("read_int", this._read_int);
+    this._operations.set("read_char", this._read_char);
+    this._operations.set("exit", this._exit);
+  }
+
+  _print_int() {
+    console.log(this._registers.get("$a0"));
+  }
+
+  _print_char() {
+    console.log(String.fromCharCode(this._registers.get("$a0")));
+  }
+
+  _read_int() {
+    const i = parseInt(prompt("Enter an integer: "));
+    this._registers.set("$v0", i);
+  }
+
+  _read_char() {
+    const c = prompt("Enter a character: ");
+    this._registers.set("$v0", c.charCodeAt(0));
+  }
+
+  _exit() {
+    throw new Error("Not implemented yet.");
+  }
+}
+
+export { Registers, ALU, MU, JU, SC };
