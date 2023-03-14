@@ -1,4 +1,4 @@
-import { Registers, ALU, MU, JU } from "./component.js";
+import { Registers, ALU, MU, JU, SC } from "./component.js";
 import { CBP } from "./cbp.js";
 
 /**
@@ -15,6 +15,7 @@ class CPU {
     this._alu = new ALU(this._registers);
     this._mu = new MU(this._registers);
     this._ju = new JU(this._registers);
+    this._sc = new SC(this._registers);
 
     this._cbp = new CBP(16, 2, 2);
   }
@@ -81,6 +82,9 @@ class CPU {
       console.log(`PC: ${this.pc} Prediction: ${prediction}, Actual: ${jump}`);
 
       this._cbp.update(this.pc, jump);
+    } else if (this._sc.operations.includes(opcode)) {
+      this._sc.run(opcode, op1, op2, op3);
+      this._registers.inc("PC");
     } else {
       throw new Error(`Operation ${opcode} not found`);
     }
@@ -101,7 +105,8 @@ class CPU {
   get isa() {
     return this._alu.operations
       .concat(this._mu.operations)
-      .concat(this._ju.operations);
+      .concat(this._ju.operations)
+      .concat(this._sc.operations);
   }
 }
 
