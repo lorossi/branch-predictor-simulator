@@ -57,7 +57,7 @@ class Registers {
   set(reg, value) {
     if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
     if (reg == "$zero") return;
-    
+
     const v = Math.floor(value) % this._max_val;
     this._registers.set(reg, v);
   }
@@ -189,14 +189,14 @@ class ALU extends Unit {
     this._registers.set(op1, v1 - v2);
   }
 
-  _addi(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 + imm);
+  _addi(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 + imm);
   }
 
-  _subi(op1, imm) {
-    const v1 = this._registers.get(op1);
-    this._registers.set(op1, v1 - imm);
+  _subi(op1, op2, imm) {
+    const v2 = this._registers.get(op2);
+    this._registers.set(op1, v2 - imm);
   }
 
   _mul(op1, op2, op3) {
