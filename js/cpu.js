@@ -11,7 +11,7 @@ class CPU {
   constructor() {
     this._instructions = [];
 
-    this._registers = new Registers(8, 16);
+    this._registers = new Registers();
     this._alu = new ALU(this._registers);
     this._mu = new MU(this._registers);
     this._ju = new JU(this._registers);
@@ -22,16 +22,24 @@ class CPU {
 
   load(instructions) {
     this._instructions = instructions;
-    this.pc = this._findProgramStart();
-    this._data = this._findData();
+    // find the start of the program
+    this._program_start = this._findProgramStart();
+    // set the program counter to the start of the program
+    this.pc = 0;
+    // find all the labels in the program
     this._labels = this._findAllLabels();
   }
 
-  run(one = false) {
-    while (this.pc < this._instructions.length) {
-      this._runInstruction();
-      if (one) break;
-    }
+  run() {
+    while (this.pc < this._instructions.length) this._runInstruction();
+    return true;
+  }
+
+  runOne() {
+    if (this.pc >= this._instructions.length) return false;
+
+    this._runInstruction();
+    return true;
   }
 
   _findProgramStart() {
@@ -44,24 +52,11 @@ class CPU {
     return index + 1;
   }
 
-  _findData() {
-    let data = [];
-    let index = this._instructions.findIndex((i) => i.opcode === ".data");
-
-    if (index == -1) return data;
-
-    this._instructions
-      .filter((i) => i.hasData)
-      .forEach((i) => {
-        this._registers.setDataByLabel(i.label, i.data);
-      });
-  }
-
   _findAllLabels() {
     let labels = new Map();
-    this._instructions.forEach((instruction, i) => {
-      if (instruction.hasLabel) {
-        labels.set(instruction.label, i);
+    this._instructions.forEach((i, x) => {
+      if (i.hasLabel) {
+        labels.set(i.label, x);
       }
     });
 
@@ -70,13 +65,7 @@ class CPU {
 
   _findLabel(label) {
     if (!this._labels.has(label)) throw new Error(`Label ${label} not found`);
-
     return this._labels.get(label);
-  }
-
-  _findDest(instruction) {
-    if (instruction.op3 == null) return instruction.op1;
-    return instruction.op3;
   }
 
   _runInstruction() {
@@ -84,35 +73,38 @@ class CPU {
     const opcode = instruction.opcode;
     const [op1, op2, op3] = instruction.operators;
 
-    console.log(instruction.toString());
-
-    if (opcode === "nop") {
+    if (opcode === "nop" || instruction.isSection || instruction.isLabel) {
       // no operation
-      this._registers.inc("$pc");
+      this.pc++;
+    } else if (instruction.hasData) {
+      // data or space
+      this._registers.setDataByLabel(instruction.label, instruction.data);
+      this.pc++;
     } else if (this._alu.operations.includes(opcode)) {
       // arithmetic and logic operations
       this._alu.run(opcode, op1, op2, op3);
-      this._registers.inc("$pc");
+      this.pc++;
     } else if (this._mu.operations.includes(opcode)) {
       // memory operations
       this._mu.run(opcode, op1, op2, op3);
-      this._registers.inc("$pc");
+      this.pc++;
     } else if (this._sc.operations.includes(opcode)) {
       // system calls
       this._sc.run(opcode, op1, op2, op3);
-      this._registers.inc("$pc");
+      this.pc++;
     } else if (this._ju.operations.includes(opcode)) {
       // jumps
       const prediction = this._cbp.predict(this.pc);
       const jump = this._ju.run(opcode, op1, op2, op3);
       if (jump) {
-        const dest = this._findDest(instruction);
-        this._registers.set("$pc", this._findLabel(dest));
+        const dest_label = op3 == null ? op1 : op3;
+        const dest_addr = this._findLabel(dest_label);
+        this.pc = dest_addr;
       } else {
-        this._registers.inc("$pc");
+        this.pc++;
       }
 
-      console.log(`PC: ${this.pc} Prediction: ${prediction}, Actual: ${jump}`);
+      // console.log(`PC: ${this.pc} Prediction: ${prediction}, Actual: ${jump}`);
 
       this._cbp.update(this.pc, jump);
     } else {
@@ -128,12 +120,20 @@ class CPU {
     return this._registers.registers;
   }
 
+  get memory() {
+    return this._registers.memory;
+  }
+
   get pc() {
     return this._registers.get("$pc");
   }
 
   set pc(value) {
     this._registers.set("$pc", value);
+  }
+
+  get currentInstruction() {
+    return this._instructions[this.pc];
   }
 
   get isa() {
