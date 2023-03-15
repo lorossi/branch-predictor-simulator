@@ -10,40 +10,89 @@ class Instruction {
     else this._data = [];
   }
 
-  static fromString(str) {
-    const section_match = /^(\.[a-zA-Z]+)$/.exec(str);
+  /**
+   * Matches a section declaration
+   * e.g. .text, .data, .bss
+   *
+   *
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   *
+   */
+  static _matchSection(str) {
+    const match = /^(\.[a-zA-Z]+)$/.exec(str);
+    if (match) return new Instruction(match[1], null, null, null, null);
+    return null;
+  }
 
-    if (section_match)
-      return new Instruction(section_match[1], null, null, null, null);
-
-    const space_match = /^([a-zA-Z]+):\s\.space\s([0-9]+)$/.exec(str);
-    console.log(space_match);
-    if (space_match) {
-      const values = Array(parseInt(space_match[2])).fill(0);
-      return new Instruction(
-        ".space",
-        null,
-        null,
-        null,
-        space_match[1],
-        values
-      );
+  /**
+   * Matches a space reservation
+   * e.g. .space 100
+   *
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   */
+  static _matchSpace(str) {
+    const match = /^([a-zA-Z]+):\s\.space\s([0-9]+)$/.exec(str);
+    if (match) {
+      const length = Array(parseInt(match[2])).fill(0);
+      return new Instruction(".space", null, null, null, match[1], length);
     }
+    return null;
+  }
 
-    const word_match = /^([a-zA-Z]+):\s\.word\s(([0-9]+\s*)+)$/.exec(str);
-    if (word_match) {
-      const values = word_match[2].split(" ").map((v) => parseInt(v));
-      return new Instruction(".word", null, null, null, word_match[1], values);
+  /**
+   * Matches a word declaration
+   * e.g. .word 1 2 3 4
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   */
+  static _matchWord(str) {
+    const match = /^([a-zA-Z]+):\s\.word\s(([0-9]+\s*)+)$/.exec(str);
+    if (match) {
+      const values = match[2].split(" ").map((v) => parseInt(v));
+      return new Instruction(".word", null, null, null, match[1], values);
     }
+    return null;
+  }
 
-    const label_match = /([a-zA-Z]+):\s*$/.exec(str);
-    if (label_match)
-      return new Instruction(null, null, null, null, label_match[1]);
+  /**
+   * Matches a label
+   * e.g. main:
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   */
+  static _matchLabel(str) {
+    const match = /^([a-zA-Z]+):\s*$/.exec(str);
+    if (match) return new Instruction(null, null, null, null, match[1]);
+    return null;
+  }
 
-    const lw_match =
+  /**
+   * Matches a lw/sw instruction
+   * e.g. lw $t0, 0($t1)
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   */
+  static _matchLwSw(str) {
+    const match =
       /(lw|sw) ([$a-zA-Z0-9]+),\s*([0-9]+)?\(([$a-zA-Z0-9]+)\)/.exec(str);
-
-    if (lw_match)
+    if (match)
       return new Instruction(
         lw_match[1],
         lw_match[2],
@@ -51,18 +100,57 @@ class Instruction {
         lw_match[4]
       );
 
+    return null;
+  }
+
+  /**
+   * Matches an instruction
+   * e.g. addi $t0 $zero 1
+   * @param {String} str
+   * @returns {Instruction|null}
+   * @memberof Instruction
+   * @private
+   * @static
+   */
+  static _matchInstruction(str) {
     const matches =
       /(([a-zA-Z_]+):\s*)?(([a-zA-Z_]+))?\s*(\(?[$a-zA-Z0-9]+\)?)?,?(\s+([$a-zA-Z0-9]+))?,?(\s+([$a-zA-Z0-9]+))?/.exec(
         str
       );
 
-    const label = matches[2];
-    const opcode = matches[4];
-    const op1 = matches[5];
-    const op2 = matches[7];
-    const op3 = matches[9];
+    if (matches) {
+      return new Instruction(
+        matches[4],
+        matches[5],
+        matches[7],
+        matches[9],
+        matches[2]
+      );
+    }
 
-    return new Instruction(opcode, op1, op2, op3, label);
+    return null;
+  }
+
+  static fromString(str) {
+    const section = Instruction._matchSection(str);
+    if (section) return section;
+
+    const space = Instruction._matchSpace(str);
+    if (space) return space;
+
+    const word = Instruction._matchWord(str);
+    if (word) return word;
+
+    const label = Instruction._matchLabel(str);
+    if (label) return label;
+
+    const lw_sw = Instruction._matchLwSw(str);
+    if (lw_sw) return lw_sw;
+
+    const instruction = Instruction._matchInstruction(str);
+    if (instruction) return instruction;
+
+    throw new Error(`Invalid instruction: ${str}`);
   }
 
   toString() {
@@ -99,18 +187,6 @@ class Instruction {
     return this._opcode;
   }
 
-  get op1() {
-    return this._op1;
-  }
-
-  get op2() {
-    return this._op2;
-  }
-
-  get op3() {
-    return this._op3;
-  }
-
   get operators() {
     return [this._op1, this._op2, this._op3];
   }
@@ -120,7 +196,7 @@ class Instruction {
   }
 
   get isSection() {
-    return this._opcode && this._opcode[0] === ".";
+    return this._opcode && this._opcode.startsWith(".");
   }
 
   get hasLabel() {
