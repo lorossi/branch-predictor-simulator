@@ -1,35 +1,44 @@
-import { Canvas } from "./canvas.js";
-import { Instruction } from "./instruction.js";
-import { CPU } from "./cpu.js";
-
-const clamp_max = (x, max1, max2) => Math.min(Math.min(x, max1), max2);
-
-const resize_canvas = () => {
-  const canvas = document.querySelector("canvas");
-  const container = canvas.parentElement;
-  const w = container.clientWidth;
-  const h = container.clientHeight;
-  const page_w = window.innerWidth;
-  const page_h = window.innerHeight;
-
-  const size = clamp_max(Math.min(w, h), page_w, page_h);
-  canvas.style.width = size + "px";
-  canvas.style.height = size + "px";
-};
+import { Model } from "./model.js";
+import { View } from "./view.js";
+import { Controller } from "./controller.js";
 
 const main = () => {
-  window.addEventListener("resize", resize_canvas);
-  resize_canvas();
+  const model = new Model();
+  const view = new View();
+  const controller = new Controller();
 
-  const instructions = [".data", "b: .space 100", ".text", "nop"].map((s) =>
-    Instruction.fromString(s)
-  );
+  controller.setModel(model);
+  controller.setView(view);
+  model.setView(view);
 
-  const cpu = new CPU();
-  cpu.load(instructions);
-  console.log(instructions);
-  cpu.run();
-  console.log(cpu.registers);
+  controller.setCode([
+    ".globl",
+    "a: .word 1 2 3 4 5",
+    "b: .word 6 7 8 9 10",
+    "out: .space 5",
+    ".text",
+    "la $t0 a",
+    "la $t1 b",
+    "la $t2 out",
+    "li $t3 5",
+    "li $t4 0",
+    "loop:",
+    "beq $t4 $t3 end",
+    "lw $t5 0($t0)",
+    "lw $t6 0($t1)",
+    "add $t7 $t5 $t6",
+    "sw $t7 0($t2)",
+    "addi $t0 $t0 4",
+    "addi $t1 $t1 4",
+    "addi $t2 $t2 4",
+    "addi $t4 $t4 1",
+    "jump loop",
+    "end:",
+  ]);
+
+  model.run();
+  console.log(model.registers);
+  console.log(model.memory);
 };
 
 document.addEventListener("DOMContentLoaded", main);
