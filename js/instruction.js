@@ -91,14 +91,8 @@ class Instruction {
    */
   static _matchLwSw(str) {
     const match =
-      /(lw|sw) ([$a-zA-Z0-9]+),\s*([0-9]+)?\(([$a-zA-Z0-9]+)\)/.exec(str);
-    if (match)
-      return new Instruction(
-        lw_match[1],
-        lw_match[2],
-        lw_match[3],
-        lw_match[4]
-      );
+      /(lw|sw)\s([$a-zA-Z0-9]+)\s\s*([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
+    if (match) return new Instruction(match[1], match[2], match[3], match[4]);
 
     return null;
   }
@@ -114,17 +108,17 @@ class Instruction {
    */
   static _matchInstruction(str) {
     const matches =
-      /(([a-zA-Z_]+):\s*)?(([a-zA-Z_]+))?\s*(\(?[$a-zA-Z0-9]+\)?)?,?(\s+([$a-zA-Z0-9]+))?,?(\s+([$a-zA-Z0-9]+))?/.exec(
+      /(?:([a-zA-Z_]+):\s+)?([a-zA-Z_]+)?\s*([$a-zA-Z0-9]+)?\s*([$a-zA-Z0-9]+)?\s*([$a-zA-Z0-9]+)?/.exec(
         str
       );
 
     if (matches) {
       return new Instruction(
+        matches[2],
+        matches[3],
         matches[4],
         matches[5],
-        matches[7],
-        matches[9],
-        matches[2]
+        matches[1]
       );
     }
 
@@ -170,7 +164,7 @@ class Instruction {
   }
 
   _formatOperand(operand) {
-    if (operand === undefined) return null;
+    if (operand === undefined || operand == null) return null;
     if (!isNaN(operand)) return parseInt(operand);
     return operand.toLowerCase();
   }
@@ -192,11 +186,19 @@ class Instruction {
   }
 
   get isSection() {
-    return this._opcode && this._opcode.startsWith(".");
+    return (
+      this._opcode != null &&
+      this._opcode.startsWith(".") &&
+      this._data.length == 0
+    );
   }
 
   get hasLabel() {
     return this._label != null;
+  }
+
+  get isLabel() {
+    return this._label != null && this._opcode == null;
   }
 
   get hasData() {
