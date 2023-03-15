@@ -18,12 +18,29 @@ class Model {
       .map((line) => Instruction.fromString(line));
 
     this._cpu.load(instructions);
-    console.log(instructions);
   }
 
   run() {
     this._cpu.run();
-    console.log(this._cpu.registers);
+  }
+
+  get registers() {
+    return this._cpu.registers;
+  }
+
+  get memory() {
+    const entries = [...this._cpu.memory["addr"].entries()];
+    const values = [...this._cpu.memory["data"]];
+    const out = {};
+
+    for (let i = 0; i < entries.length; i++) {
+      const start = entries[i][1];
+      const end = i < entries.length - 1 ? entries[i + 1][1] : values.length;
+
+      out[entries[i][0]] = values.slice(start, end);
+    }
+
+    return out;
   }
 }
 
