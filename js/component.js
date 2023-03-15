@@ -1,8 +1,7 @@
 /**
  * @class Registers
  *
- * @param {number} k - Number of registers
- * @param {number} n - Size of the registers (in bits)
+ * @param {number} n - Size of of registers
  *
  * @description
  * This class represents the registers of the CPU.
@@ -10,10 +9,15 @@
  *
  */
 class Registers {
-  constructor(k = 8, n = 8) {
-    this._k = k;
+  constructor(n = 32) {
+    if (n < 0) throw new Error("Size of registers cannot be negative");
+    if (n > 64) throw new Error("Size of registers cannot be greater than 32");
+
     this._n = n;
-    this._max_val = 2 ** n - 1;
+    this._max_val = 2 ** (n - 1) - 1;
+    this._min_val = (-2) ** (n - 1);
+
+    this._addr_increment = Math.floor(n / 8);
 
     this._registers = new Map();
 
@@ -34,8 +38,14 @@ class Registers {
     this._registers.set("$hi", 0);
     this._registers.set("$lo", 0);
 
-    this._registers.set("$data", []);
-    this._registers.set("$addr", new Map());
+    this._registers.set("data", []);
+    this._registers.set("addr", new Map());
+  }
+
+  _wrap(val) {
+    while (val > this._max_val) return val - this._max_val;
+    while (val < this._min_val) return val + this._max_val;
+    return val;
   }
 
   inc(reg) {
@@ -58,54 +68,64 @@ class Registers {
     if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
     if (reg == "$zero") return;
 
-    const v = Math.floor(value) % this._max_val;
+    const v = this._wrap(value);
     this._registers.set(reg, v);
   }
 
   getDataByLabel(label) {
-    if (!this._registers.get("$addr").has(label))
+    if (!this._registers.get("addr").has(label))
       throw new Error(`Label ${label} not found`);
 
-    const addr = this._registers.get("$addr").get(label);
-    return this._registers.get("$data")[addr];
+    const addr = this._registers.get("addr").get(label);
+    return this._registers.get("data")[addr];
   }
 
   getDataByAddress(addr) {
-    if (addr >= this._registers.get("$data").length)
+    if (addr >= this._registers.get("data").length)
       throw new Error(`Address ${addr} not found`);
 
-    return this._registers.get("$data")[addr];
+    return this._registers.get("data")[addr];
   }
 
   setDataByLabel(label, data) {
-    const addr = this._registers.get("$data").length;
-    this._registers.get("$data").push(...data);
-    this._registers.get("$addr").set(label, addr);
+    const addr = this._registers.get("data").length;
+    this._registers.get("data").push(...data);
+    this._registers.get("addr").set(label, addr);
     return addr;
   }
 
   setDataByAddress(addr, data) {
-    if (addr >= this._registers.get("$data").length)
+    if (addr >= this._registers.get("data").length)
       throw new Error(`Address ${addr} not found`);
 
-    this._registers.get("$data")[addr] = data;
+    this._registers.get("data")[addr] = data;
   }
 
   getAddressByLabel(label) {
-    if (!this._registers.get("$addr").has(label))
+    if (!this._registers.get("addr").has(label))
       throw new Error(`Label ${label} not found`);
 
-    return this._registers.get("$addr").get(label);
+    return this._registers.get("addr").get(label);
   }
 
   get registers() {
     let registers = {};
-    for (let [key, value] of this._registers) registers[key] = value;
+    for (let [key, value] of this._registers) {
+      if (key.includes("$")) registers[key] = value;
+    }
     return registers;
   }
 
-  get k() {
-    return this._k;
+  get memory() {
+    let registers = {};
+    for (let [key, value] of this._registers) {
+      if (!key.includes("$")) registers[key] = value;
+    }
+    return registers;
+  }
+
+  get addr_increment() {
+    return this._addr_increment;
   }
 
   get pc() {
@@ -288,7 +308,7 @@ class MU extends Unit {
 
   _lw(op1, imm, op2) {
     const v2 = this._registers.get(op2);
-    const address = Math.floor(v2 / 4 + imm);
+    const address = Math.floor(v2 / this._registers.addr_increment + imm);
     const data = this._registers.getDataByAddress(address);
 
     this._registers.set(op1, data);
@@ -298,7 +318,6 @@ class MU extends Unit {
     const v1 = this._registers.get(op1);
     const v3 = this._registers.get(op3);
     const address = Math.floor(v3 / 4 + imm);
-
     this._registers.setDataByAddress(address, v1);
   }
 
@@ -307,12 +326,13 @@ class MU extends Unit {
   }
 
   _la(op1, label) {
-    const address = this._registers.getAddressByLabel(label);
+    const address =
+      this._registers.getAddressByLabel(label) * this._registers.addr_increment;
     this._registers.set(op1, address);
   }
 
   _lui(op1, v1) {
-    this._registers.set(op1, v1 << (this._registers.k / 2));
+    this._registers.set(op1, v1 / this._registers.addr_increment);
   }
 
   _mfhi(op1) {
@@ -348,7 +368,7 @@ class JU extends Unit {
     this._operations.set("bge", this._bge);
     this._operations.set("blt", this._blt);
     this._operations.set("ble", this._ble);
-    this._operations.set("jump", this._jmp);
+    this._operations.set("jump", this._jump);
   }
 
   _beq(op1, op2) {
@@ -387,7 +407,7 @@ class JU extends Unit {
     return v1 <= v2;
   }
 
-  _jmp() {
+  _jump() {
     return true;
   }
 }
