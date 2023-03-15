@@ -3,13 +3,25 @@ class Canvas {
     this._canvas = document.querySelector(selector);
     this._ctx = this._canvas.getContext("2d");
     this._last_time = 0;
+    this._running = false;
 
     window.requestAnimationFrame(this._run.bind(this));
+
+    this.autoResize();
+  }
+
+  start() {
+    this._running = true;
+  }
+
+  stop() {
+    this._running = false;
   }
 
   _run() {
     window.requestAnimationFrame(this._run.bind(this));
 
+    if (!this._running) return;
     if (this._last_time == 0) this._last_time = performance.now();
 
     const now = performance.now();
@@ -28,6 +40,24 @@ class Canvas {
 
   draw() {
     // Override this method
+    this._ctx.fillStyle = "black";
+    this._ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+  }
+
+  resize(width, height) {
+    this._canvas.width = width;
+    this._canvas.height = height;
+  }
+
+  autoResize() {
+    const parent = this._canvas.parentElement;
+    const w = parent.clientWidth;
+    const h = parent.clientHeight;
+
+    if (this._canvas.width != w || this._canvas.height != h) {
+      const size = Math.min(w, h);
+      this.resize(size, size);
+    }
   }
 }
 
