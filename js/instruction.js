@@ -132,23 +132,19 @@ class Instruction {
   }
 
   static fromString(str) {
-    const section = Instruction._matchSection(str);
-    if (section) return section;
+    const methods = [
+      Instruction._matchSection,
+      Instruction._matchSpace,
+      Instruction._matchWord,
+      Instruction._matchLabel,
+      Instruction._matchLwSw,
+      Instruction._matchInstruction,
+    ];
 
-    const space = Instruction._matchSpace(str);
-    if (space) return space;
-
-    const word = Instruction._matchWord(str);
-    if (word) return word;
-
-    const label = Instruction._matchLabel(str);
-    if (label) return label;
-
-    const lw_sw = Instruction._matchLwSw(str);
-    if (lw_sw) return lw_sw;
-
-    const instruction = Instruction._matchInstruction(str);
-    if (instruction) return instruction;
+    for (const method of methods) {
+      const instruction = method(str);
+      if (instruction) return instruction;
+    }
 
     throw new Error(`Invalid instruction: ${str}`);
   }
