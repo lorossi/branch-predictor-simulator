@@ -35,10 +35,6 @@ const main = () => {
     "jump loop",
     "end:",
   ]);
-
-  model.run();
-  console.log(model.registers);
-  console.log(model.memory);
 };
 
 document.addEventListener("DOMContentLoaded", main);

@@ -24,6 +24,15 @@ class View {
         div.textContent = line;
         this._code.appendChild(div);
       });
+
+    this.setActiveLine(0);
+  }
+
+  setActiveLine(line_index) {
+    this._code.querySelectorAll("div").forEach((div, i) => {
+      if (i === line_index) div.classList.add("active");
+      else div.classList.remove("active");
+    });
   }
 }
 

@@ -20,8 +20,9 @@ class Model {
     this._cpu.load(instructions);
   }
 
-  run() {
-    this._cpu.run();
+  runOne() {
+    this._cpu.runOne();
+    this._view.setActiveLine(this._cpu.pc);
   }
 
   get registers() {
