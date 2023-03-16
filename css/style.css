@@ -21,3 +21,11 @@ canvas {
   border: 1px solid black;
   font-family: monospace;
 }
+
+.code > div {
+  display: inline-block;
+}
+
+.code .active {
+  background-color: #b3b3b3;
+}
