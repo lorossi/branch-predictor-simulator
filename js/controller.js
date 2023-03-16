@@ -5,7 +5,7 @@ class Controller {
 
     document
       .querySelector("#run_one")
-      .addEventListener("click", this._runOne.bind(this));
+      .addEventListener("click", this.runOne.bind(this));
   }
 
   setModel(model) {
@@ -21,7 +21,7 @@ class Controller {
     this._view.setCode(code);
   }
 
-  _runOne() {
+  runOne() {
     this._model.runOne();
   }
 }
