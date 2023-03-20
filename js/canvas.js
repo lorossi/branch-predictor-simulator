@@ -54,8 +54,10 @@ class Canvas {
     const w = parent.clientWidth;
     const h = parent.clientHeight;
 
+    const mh = document.body.scrollHeight * 0.8;
+
     if (this._canvas.width != w || this._canvas.height != h) {
-      const size = Math.min(w, h);
+      const size = Math.min(Math.min(w, h), mh);
       this.resize(size, size);
     }
   }
