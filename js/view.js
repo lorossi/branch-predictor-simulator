@@ -30,11 +30,11 @@ class View {
   }
 
   setMemory(registers, globals) {
-    this._setMemory(registers, this._registers);
-    this._setMemory(globals, this._globals);
+    this._setRegisters(registers, this._registers);
+    this._setRegisters(globals, this._globals);
   }
 
-  _setMemory(global, container) {
+  _setRegisters(register, container) {
     const create_selector = (key) => `#${key.replace("$", "")}`;
     const create_id = (key) => create_selector(key).replace("#", "");
     const create_div = (key, value) => {
@@ -52,7 +52,7 @@ class View {
       return div;
     };
 
-    Object.entries(global).forEach(([key, value]) => {
+    Object.entries(register).forEach(([key, value]) => {
       const selector = create_selector(key);
       const existing_div = container.querySelector(selector);
 
