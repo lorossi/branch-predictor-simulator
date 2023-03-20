@@ -6,6 +6,8 @@ class View {
     this._predictor = document.querySelector(".predictor");
     this._active_bht = document.querySelector(".bht");
     this._history = document.querySelector(".history");
+
+    this._active_line = 0;
   }
 
   setCode(code) {
@@ -17,7 +19,7 @@ class View {
         this._code.appendChild(div);
       });
 
-    this.setActiveLine(0);
+    this.setActiveInstruction(0);
   }
 
   setCBP(cbp) {
@@ -83,15 +85,13 @@ class View {
     cbp.BHTs.forEach((bht, i) => {
       const div = this._predictor.querySelector(div_selector(i));
 
-      if (i === cbp.activeBHT) {
-        div.classList.add("active");
-      } else if (div.classList.contains("active")) {
-        div.classList.remove("active");
-      }
-
       bht.entriesFormatted.forEach((entry) => {
         const p = document.createElement("p");
         p.textContent = `${entry.address}(${entry.int_address}): ${entry.prediction}`;
+        if (entry.int_address == this._active_line && i == cbp.activeBHT) {
+          p.classList.add("active");
+        }
+
         div.appendChild(p);
       });
     });
@@ -133,7 +133,9 @@ class View {
     });
   }
 
-  setActiveLine(line_index) {
+  setActiveInstruction(line_index) {
+    this._active_line = line_index;
+
     this._code.querySelectorAll("div").forEach((div, i) => {
       if (i === line_index) div.classList.add("active");
       else div.classList.remove("active");
