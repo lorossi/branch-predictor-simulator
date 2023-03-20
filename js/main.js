@@ -17,24 +17,44 @@ const main = () => {
     "b: .word 6 7 8 9 10",
     "out: .space 5",
     ".text",
-    "la $t0 a",
-    "la $t1 b",
-    "la $t2 out",
-    "li $t3 5",
-    "li $t4 0",
+    "la $t0, a",
+    "la $t1, b",
+    "la $t2, out",
+    "li $t3, 5",
+    "li $t4, 0",
     "loop:",
-    "beq $t4 $t3 end",
-    "lw $t5 0($t0)",
-    "lw $t6 0($t1)",
-    "add $t7 $t5 $t6",
-    "sw $t7 0($t2)",
-    "addi $t0 $t0 4",
-    "addi $t1 $t1 4",
-    "addi $t2 $t2 4",
-    "addi $t4 $t4 1",
+    "beq $t4, $t3, end",
+    "lw $t5, 0($t0)",
+    "lw $t6, 0($t1)",
+    "add $t7, $t5, $t6",
+    "sw $t7, 0($t2)",
+    "addi $t0, $t0, 4",
+    "addi $t1, $t1, 4",
+    "addi $t2, $t2, 4",
+    "addi $t4, $t4, 1",
     "jump loop",
     "end:",
   ]);
+
+  document
+    .querySelector("#upload_code_button")
+    .addEventListener("click", () => {
+      document.querySelector("#upload_code").click();
+    });
+
+  // open file and set it as the code
+  document.querySelector("#upload_code").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener("load", (e) => {
+      const code = e.target.result.split("\n");
+      controller.reset();
+      controller.setCode(code);
+    });
+
+    reader.readAsText(file);
+  });
 };
 
 document.addEventListener("DOMContentLoaded", main);

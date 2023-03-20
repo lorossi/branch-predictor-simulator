@@ -11,6 +11,8 @@ class View {
   }
 
   setCode(code) {
+    this._code.innerHTML = "";
+
     const pad_length = String(code.length).length;
     code
       .filter((line) => line.length > 0)
@@ -94,7 +96,10 @@ class View {
       bht.entriesFormatted.forEach((entry) => {
         const p = document.createElement("p");
         p.textContent = `${entry.address}(${entry.int_address}): ${entry.prediction}`;
-        if (entry.int_address == this._active_line && i == cbp.activeBHT) {
+        if (
+          entry.int_address == this._active_line % bht.max_addr &&
+          i == cbp.activeBHT
+        ) {
           p.classList.add("active");
         }
 
@@ -104,14 +109,14 @@ class View {
   }
 
   setMemory(registers, globals) {
+    this._registers.innerHTML = "";
+    this._globals.innerHTML = "";
     this._setRegisters(registers, this._registers);
     this._setRegisters(globals, this._globals);
   }
 
   _setRegisters(register, container) {
-    const create_selector = (key) => `#${key.replace("$", "")}`;
-    const create_id = (key) => create_selector(key).replace("#", "");
-    const create_div = (key, value) => {
+    Object.entries(register).forEach(([key, value]) => {
       const name_p = document.createElement("p");
       name_p.textContent = `${key}:`;
       name_p.classList.add("name");
@@ -119,23 +124,11 @@ class View {
       value_p.textContent = value;
       value_p.classList.add("value");
       const div = document.createElement("div");
-      div.id = create_id(key);
+      div.id = key.replace("$", "");
       div.classList.add("cell");
       div.appendChild(name_p);
       div.appendChild(value_p);
-      return div;
-    };
-
-    Object.entries(register).forEach(([key, value]) => {
-      const selector = create_selector(key);
-      const existing_div = container.querySelector(selector);
-
-      if (existing_div) {
-        existing_div.querySelector(".value").textContent = value;
-      } else {
-        const div = create_div(key, value);
-        container.appendChild(div);
-      }
+      container.appendChild(div);
     });
   }
 

@@ -7,6 +7,10 @@ class Model {
     this._view = null;
   }
 
+  reset() {
+    this._cpu.reset();
+  }
+
   setView(view) {
     this._view = view;
   }
