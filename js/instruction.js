@@ -91,7 +91,7 @@ class Instruction {
    */
   static _matchLwSw(str) {
     const match =
-      /(lw|sw)\s([$a-zA-Z0-9]+)\s\s*([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
+      /(lw|sw)\s([$a-zA-Z0-9]+),\s([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
     if (match) return new Instruction(match[1], match[2], match[3], match[4]);
 
     return null;
@@ -99,7 +99,7 @@ class Instruction {
 
   /**
    * Matches an instruction
-   * e.g. addi $t0 $zero 1
+   * e.g. addi $t0, $zero 1
    * @param {String} str
    * @returns {Instruction|null}
    * @memberof Instruction
@@ -108,7 +108,7 @@ class Instruction {
    */
   static _matchInstruction(str) {
     const matches =
-      /(?:([a-zA-Z_]+):\s+)?([a-zA-Z_]+)?\s*([$a-zA-Z0-9]+)?\s*([$a-zA-Z0-9]+)?\s*([$a-zA-Z0-9]+)?/.exec(
+      /(?:([a-zA-Z_]+):\s+)?([a-zA-Z_]+)\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z0-9]+)?/.exec(
         str
       );
 
