@@ -30,6 +30,11 @@ class CPU {
     this._labels = this._findAllLabels();
   }
 
+  reset() {
+    this._registers.reset();
+    this._cbp.reset();
+  }
+
   run() {
     while (this.pc < this._instructions.length) this._runInstruction();
     return true;
