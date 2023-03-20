@@ -50,6 +50,10 @@ class Model {
   get registers() {
     return this._cpu.registers;
   }
+
+  get cbp() {
+    return this._cpu.cbp;
+  }
 }
 
 export { Model };
