@@ -29,6 +29,38 @@
   width: 25%;
 }
 
+.predictor {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  font-family: monospace;
+}
+
+.history,
+.bht {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  font-family: monospace;
+}
+
+.predictor > div {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.bht .name,
+.history .name,
+.predictor .name {
+  font-weight: bold;
+  padding-right: 2px;
+}
+
 .memory {
   display: flex;
   flex-direction: column;
@@ -65,10 +97,6 @@
   font-weight: bold;
 }
 
-canvas {
-  aspect-ratio: 1;
-}
-
 .code {
   border: 1px solid black;
   font-family: monospace;
@@ -78,6 +106,6 @@ canvas {
   display: inline-block;
 }
 
-.code .active {
+.active {
   background-color: #b3b3b3;
 }
