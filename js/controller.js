@@ -6,7 +6,9 @@ class Controller {
     document
       .querySelector("#run_one")
       .addEventListener("click", this.runOne.bind(this));
-    document.querySelector("#run_all").addEventListener("click", () => {}); // TODO
+    document.querySelector("#run_all").addEventListener("click", () => {
+      this.runAll().bind(this);
+    });
   }
 
   reset() {
@@ -36,6 +38,11 @@ class Controller {
 
   runOne() {
     this._model.runOne();
+    this._updateView();
+  }
+
+  runAll() {
+    this._model.runAll();
     this._updateView();
   }
 }

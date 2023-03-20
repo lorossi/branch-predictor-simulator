@@ -28,6 +28,10 @@ class Model {
     this._cpu.runOne();
   }
 
+  runAll() {
+    this._cpu.run();
+  }
+
   get registers() {
     return this._cpu.registers;
   }
