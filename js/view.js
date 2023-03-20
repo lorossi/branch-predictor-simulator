@@ -73,6 +73,11 @@ class View {
       const name = document.createElement("p");
       name.textContent = `BHT ${i}`;
       name.classList.add("name");
+
+      if (i == cbp.activeBHT) {
+        name.classList.add("active");
+      }
+
       div.appendChild(name);
 
       const stats = document.createElement("p");

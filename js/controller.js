@@ -25,7 +25,7 @@ class Controller {
 
   runOne() {
     this._model.runOne();
-    this._view.setActiveLine(this._model.current_line);
+    this._view.setActiveInstruction(this._model.current_line);
     this._view.setMemory(this._model.registers, this._model.global);
     this._view.setCBP(this._model.cbp);
   }
