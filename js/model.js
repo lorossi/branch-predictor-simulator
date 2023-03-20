@@ -1,5 +1,7 @@
 import { CPU } from "./cpu.js";
+import { CBP } from "./cbp.js";
 import { Instruction } from "./instruction.js";
+import { View } from "./view.js";
 
 class Model {
   constructor() {
@@ -7,14 +9,26 @@ class Model {
     this._view = null;
   }
 
+  /**
+   * Reset the CPU.
+   */
   reset() {
     this._cpu.reset();
   }
 
+  /**
+   *
+   * @param {View} view
+   */
   setView(view) {
     this._view = view;
   }
 
+  /**
+   * Set the code to be executed by the CPU.
+   *
+   * @param {string[]} code
+   */
   setCode(code) {
     const instructions = code
       .map((line) => line.trim())
@@ -24,18 +38,35 @@ class Model {
     this._cpu.load(instructions);
   }
 
+  /**
+   * Run one instruction
+   * @returns {boolean} true if the CPU is still running, false otherwise
+   */
   runOne() {
-    this._cpu.runOne();
+    return this._cpu.runOne();
   }
 
+  /**
+   *  Run all instructions
+   * @returns {boolean} true if the CPU is still running, false otherwise
+   */
   runAll() {
-    this._cpu.run();
+    return this._cpu.run();
   }
 
+  /**
+   * Get the registers of the CPU.
+   *
+   * @returns {Array.<string, Number>}
+   */
   get registers() {
     return this._cpu.registers;
   }
 
+  /**
+   * Get the global variables of the CPU.
+   * @returns {Array.<string, Number>}
+   */
   get global() {
     const entries = [...this._cpu.global["addr"].entries()];
     const values = [...this._cpu.global["global"]];
@@ -51,14 +82,20 @@ class Model {
     return out;
   }
 
+  /**
+   * Get the current line of the CPU.
+   * @returns {Number}
+   * @readonly
+   */
   get current_line() {
     return this._cpu.pc;
   }
 
-  get registers() {
-    return this._cpu.registers;
-  }
-
+  /**
+   * Get the cbp of the CPU.
+   *
+   * @returns {CBP}
+   */
   get cbp() {
     return this._cpu.cbp;
   }

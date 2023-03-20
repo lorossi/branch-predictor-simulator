@@ -1,7 +1,7 @@
 /**
  * @class Registers
  *
- * @param {number} n - Size of of registers
+ * @param {Number} n - Size of of registers
  *
  * @description
  * This class represents the registers of the CPU.
@@ -42,28 +42,56 @@ class Registers {
     this._registers.set("addr", new Map());
   }
 
+  /**
+   * Wrap a value to the range of the registers.
+   *
+   * @param {Number} val
+   * @returns {Number}
+   */
   _wrap(val) {
     while (val > this._max_val) return val - this._max_val;
     while (val < this._min_val) return val + this._max_val;
     return val;
   }
 
+  /**
+   * Increment a register by 1.
+   * @param {string} reg - Register to increment
+   */
   inc(reg) {
     const v = this._registers.get(reg) + 1;
     this.set(reg, v);
   }
 
+  /**
+   * Decrement a register by 1.
+   *
+   * @param {string} reg - Register to decrement
+   * @returns {Number}
+   */
   dec(reg) {
     const v = this.get(reg) - 1;
     this.set(reg, v);
   }
 
+  /**
+   * Get the value of a register.
+   * @param {string} reg - Register to get
+   * @returns {Number}
+   */
   get(reg) {
     if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
 
     return this._registers.get(reg);
   }
 
+  /**
+   * Set the value of a register.
+   *
+   * @param {string} reg - Register to set
+   * @param {Number} value - Value to set
+   * @returns {Number}
+   */
   set(reg, value) {
     if (!this._registers.has(reg)) throw new Error(`Register ${reg} not found`);
     if (reg == "$zero") return;
@@ -72,6 +100,13 @@ class Registers {
     this._registers.set(reg, v);
   }
 
+  /**
+   * Get the value of a global variable.
+   *
+   * @param {string} label - Label of the global variable
+   * @returns {Number}
+   * @throws {Error} If the label is not found
+   */
   getGlobalByLabel(label) {
     if (!this._registers.get("addr").has(label))
       throw new Error(`Label ${label} not found`);
@@ -80,6 +115,13 @@ class Registers {
     return this._registers.get("global")[addr];
   }
 
+  /**
+   * Get the value of a global variable.
+   *
+   * @param {Number} addr - Address of the global variable
+   * @returns {Number}
+   * @throws {Error} If the address is not found
+   */
   getGlobalByAddress(addr) {
     if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
@@ -87,6 +129,13 @@ class Registers {
     return this._registers.get("global")[addr];
   }
 
+  /**
+   * Set the value of a global variable.
+   *
+   * @param {string} label - Label of the global variable
+   * @param {Number} global - Value to set
+   * @returns {Number} - Address of the global variable
+   */
   setGlobalByLabel(label, global) {
     const addr = this._registers.get("global").length;
     this._registers.get("global").push(...global);
@@ -94,6 +143,13 @@ class Registers {
     return addr;
   }
 
+  /**
+   * Set the value of a global variable.
+   *
+   * @param {Number} addr - Address of the global variable
+   * @param {Number} global - Value to set
+   * @throws {Error} If the address is not found
+   */
   setGlobalByAddress(addr, global) {
     if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
@@ -101,6 +157,13 @@ class Registers {
     this._registers.get("global")[addr] = global;
   }
 
+  /**
+   * Get the address of a global variable.
+   *
+   * @param {string} label - Label of the global variable
+   * @returns {Number}
+   * @throws {Error} If the label is not found
+   */
   getAddressByLabel(label) {
     if (!this._registers.get("addr").has(label))
       throw new Error(`Label ${label} not found`);
@@ -108,6 +171,9 @@ class Registers {
     return this._registers.get("addr").get(label);
   }
 
+  /**
+   * Reset the registers to their initial values.
+   */
   reset() {
     for (let [key, _] of this._registers) {
       if (key.includes("$") && key != "$zero") this._registers.set(key, 0);
@@ -116,6 +182,10 @@ class Registers {
     }
   }
 
+  /**
+   * Get the registers.
+   * @returns {Map<string, Number>}
+   */
   get registers() {
     let registers = {};
     for (let [key, value] of this._registers) {
@@ -124,6 +194,10 @@ class Registers {
     return registers;
   }
 
+  /**
+   * Get the global variables.
+   * @returns {Map<string, Number>}
+   */
   get global() {
     let registers = {};
     for (let [key, value] of this._registers) {
@@ -132,10 +206,21 @@ class Registers {
     return registers;
   }
 
+  /**
+   * Get the address increment.
+   * Used to increment the address in load and store instructions.
+   * @readonly
+   * @returns {Number}
+   */
   get addr_increment() {
     return this._addr_increment;
   }
 
+  /**
+   * Get the program counter.
+   * @readonly
+   * @returns {Number}
+   */
   get pc() {
     return this.get("$pc");
   }
@@ -438,7 +523,7 @@ class SC extends Unit {
 
   _print_char() {
     const c = this._registers.get("$a0");
-    console.log(`$v0 = ${String.fromCharCode(c)}`);
+    console.log(`$v0 = ${string.fromCharCode(c)}`);
   }
 
   _read_int() {

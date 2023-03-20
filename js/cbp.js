@@ -6,9 +6,9 @@ import { BHT } from "./bht.js";
  * @description
  * CBP is a class that implements a Combined Branch Predictor.
  *
- * @param {number} k - The number of bits used to index the address
- * @param {number} n - The number of bits used to represent the prediction
- * @param {number} m - The number of bits used to index the history
+ * @param {Number} k - The Number of bits used to index the address
+ * @param {Number} n - The Number of bits used to represent the prediction
+ * @param {Number} m - The Number of bits used to index the history
  */
 class CBP {
   constructor(k, n, m) {
@@ -23,11 +23,20 @@ class CBP {
     this._history = new History(m);
   }
 
+  /**
+   * Reset the CBP to its initial state
+   */
   reset() {
     this._BHTs.forEach((bht) => bht.reset());
     this._history.reset();
   }
 
+  /**
+   * Predict the outcome of a branch
+   *
+   * @param {Number} address - The address of the branch
+   * @returns {Boolean} The predicted outcome of the branch
+   */
   predict(address) {
     const key = this._history.get();
     const value = this._BHTs[key].predict(address);
@@ -35,6 +44,13 @@ class CBP {
     return value;
   }
 
+  /**
+   * Update the CBP with the outcome of a branch
+   *
+   * @param {Number} address - The address of the branch
+   * @param {Boolean} outcome - The outcome of the branch
+   * @throws {Error} If the outcome is not a boolean
+   */
   update(address, outcome) {
     if (typeof outcome != "boolean")
       throw new Error(
@@ -47,6 +63,11 @@ class CBP {
     this._history.update(outcome);
   }
 
+  /**
+   * Get the accuracy of the CBP.
+   * The accuracy is the product of the accuracy of each BHT.
+   * @return {Number}
+   */
   get accuracy() {
     return this._BHTs.reduce(
       (acc, bht) => (bht.accuracy == 0 ? 1 : bht.accuracy) * acc,
@@ -54,39 +75,86 @@ class CBP {
     );
   }
 
+  /**
+   * Get the BHTs used by the CBP
+   * @return {Array<BHT>}
+   * @readonly
+   */
   get BHTs() {
     return this._BHTs;
   }
 
+  /**
+   * Get the counter of the active BHT of the CBP
+   * @return {Number}
+   * @readonly
+   */
   get activeBHT() {
     return this._history.get();
   }
 
+  /**
+   * Get the history of the CBP
+   * @return {string}
+   * @readonly
+   */
   get history() {
     return this._history.history.join("").padStart(this._m, "0");
   }
 }
 
+/**
+ * @class History
+ *
+ * @description
+ * History is a class that implements a history of the last m outcomes.
+ *
+ * @param {Number} m - The Number of bits used to index the history
+ */
 class History {
   constructor(m) {
     this._m = m;
     this._history = Array(m).fill(0);
   }
 
+  /**
+   * Update the history with the outcome of a branch.
+   *
+   * @param {Boolean} value
+   * @throws {Error} If the outcome is not a boolean
+   */
   update(value) {
+    if (typeof value != "boolean")
+      throw new Error(
+        `value must be a boolean, `,
+        `got ${typeof value} instead`
+      );
     const v = value ? 1 : 0;
     this._history.shift();
     this._history.push(v);
   }
 
+  /**
+   * Reset the history to its initial state
+   */
   reset() {
     this._history = Array(this._m).fill(0);
   }
 
+  /**
+   * Get the history as a binary number
+   * @return {string}
+   * @readonly
+   */
   get() {
     return parseInt(this._history.join(""), 2);
   }
 
+  /**
+   * Get the history as an array of numbers
+   * @return {Array<Number>}
+   * @readonly
+   */
   get history() {
     return [...this._history];
   }

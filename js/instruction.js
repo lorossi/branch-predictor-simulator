@@ -15,7 +15,7 @@ class Instruction {
    * e.g. .text, .global, .bss
    *
    *
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -32,7 +32,7 @@ class Instruction {
    * Matches a space reservation
    * e.g. .space 100
    *
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -50,7 +50,7 @@ class Instruction {
   /**
    * Matches a word declaration
    * e.g. .word 1 2 3 4
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -68,7 +68,7 @@ class Instruction {
   /**
    * Matches a label
    * e.g. main:
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -83,7 +83,7 @@ class Instruction {
   /**
    * Matches a lw/sw instruction
    * e.g. lw $t0, 0($t1)
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -100,7 +100,7 @@ class Instruction {
   /**
    * Matches an instruction
    * e.g. addi $t0, $zero 1
-   * @param {String} str
+   * @param {string} str
    * @returns {Instruction|null}
    * @memberof Instruction
    * @private
@@ -125,6 +125,15 @@ class Instruction {
     return null;
   }
 
+  /**
+   * Returns the instruction parsed from a string.
+   * If the string is not a valid instruction, an error is thrown.
+   *
+   * @throws {Error} if the string is not a valid instruction
+   * @param {string} str string representation of an instruction
+   * @returns {Instruction}
+   * @static
+   */
   static fromString(str) {
     const methods = [
       Instruction._matchSection,
@@ -157,9 +166,11 @@ class Instruction {
           break;
       }
     } else if (this._opcode) str += `${this._opcode}`;
-    if (this._op1) str += ` ${this._op1}`;
-    if (this._op2) str += ` ${this._op2}`;
+    if (this._op1) str += ` ${this._op1},`;
+    if (this._op2) str += ` ${this._op2},`;
     if (this._op3) str += ` ${this._op3}`;
+    // remove trailing comma
+    str = str.replace(/,$/, "");
     return str;
   }
 
@@ -169,22 +180,40 @@ class Instruction {
     return operand.toLowerCase();
   }
 
+  /**
+   * Returns the label associated with the instruction.
+   */
   get label() {
     return this._label;
   }
 
+  /**
+   * Returns the opcode associated with the instruction.
+   */
   get opcode() {
     return this._opcode;
   }
 
-  get operators() {
+  /**
+   * Returns the operands associated with the instruction.
+   */
+  get operands() {
     return [this._op1, this._op2, this._op3];
   }
 
+  /**
+   * Returns the global data associated with the instruction.
+   * This is only used for .word and .space instructions.
+   * @returns {Array}
+   */
   get global() {
     return this._global;
   }
 
+  /**
+   * Returns true if the instruction is a section declaration.
+   * @returns {Boolean}
+   */
   get isSection() {
     return (
       this._opcode != null &&
@@ -193,14 +222,26 @@ class Instruction {
     );
   }
 
+  /**
+   * Returns true if the instruction has a label.
+   * @returns {Boolean}
+   */
   get hasLabel() {
     return this._label != null;
   }
 
+  /**
+   * Returns true if the instruction is a label.
+   * @returns {Boolean}
+   */
   get isLabel() {
     return this._label != null && this._opcode == null;
   }
 
+  /**
+   * Returns true if the instruction has global data.
+   * @returns {Boolean}
+   */
   get hasGlobal() {
     return this._global.length > 0;
   }

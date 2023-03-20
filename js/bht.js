@@ -1,8 +1,8 @@
 /**
  * @class BHT
  *
- * @param {number} k - The number of bits used to represent the address
- * @param {number} n - The number of bits used to represent the prediction
+ * @param {integer} k - The Number of bits used to represent the address
+ * @param {integer} n - The Number of bits used to represent the prediction
  */
 class BHT {
   constructor(k, n) {
@@ -10,14 +10,8 @@ class BHT {
     this._n = n;
 
     this._max_addr = 2 ** k;
-    this._correct = 0;
-    this._incorrect = 0;
 
-    this._prediction = new Map();
-    for (let i = 0; i < this._max_addr; i++) {
-      const addr = this._correctAddressLength(i);
-      this._prediction.set(addr, 0);
-    }
+    this.reset();
   }
 
   /**
@@ -65,10 +59,21 @@ class BHT {
     this._prediction.set(address, new_value);
   }
 
+  /**
+   *
+   * @param {integer} value address for the prediction
+   * @returns {boolean} true if the prediction is greater than n/2, false otherwise
+   * @private
+   */
   _toBool(value) {
     return value > this._n / 2;
   }
 
+  /**
+   *
+   * @param {integer} address
+   * @returns {boolean} true if the prediction is "taken", false if the prediction is "not taken"
+   */
   predict(address) {
     const key = this._correctAddressLength(address);
     const value = this._getPrediction(key);
@@ -76,6 +81,14 @@ class BHT {
     return this._toBool(value);
   }
 
+  /**
+   * Updates the prediction for the given address.
+   * If the prediction is correct, the value is incremented by 1.
+   * If the prediction is incorrect, the value is decremented by 1.
+   *
+   * @param {integer} address
+   * @param {boolean} outcome
+   */
   update(address, outcome) {
     if (typeof outcome !== "boolean")
       throw new Error(
@@ -98,30 +111,38 @@ class BHT {
     this._setPrediction(key, new_value);
   }
 
+  /**
+   * Reset the branch history table to its initial state.
+   * All predictions are set to 0.
+   * The Number of correct and incorrect predictions is set to 0.
+   */
   reset() {
     this._correct = 0;
     this._incorrect = 0;
 
+    this._prediction = new Map();
     for (let i = 0; i < this._max_addr; i++) {
       const addr = this._correctAddressLength(i);
       this._prediction.set(addr, 0);
     }
   }
 
-  get addresses() {
-    return [...this._prediction.keys()].sort();
-  }
-
+  /**
+   * @returns {Array} - An array of arrays, where each inner array contains the address and prediction
+   */
   get predictions() {
-    return [...this._prediction.values()].sort();
-  }
-
-  get entries() {
     return [...this._prediction.entries()].sort();
   }
 
-  get entriesFormatted() {
-    return this.entries.map((entry) => ({
+  /**
+   * @returns {Array} - An array of objects, where each object contains the address, prediction, and boolean prediction
+   * @property {string} address - The address in binary
+   * @property {Number} int_address - The address in decimal
+   * @property {string} prediction - The prediction in binary
+   * @property {boolean} bool_prediction - The prediction as a boolean
+   */
+  get predictions_formatted() {
+    return this.predictions.map((entry) => ({
       address: entry[0],
       int_address: String(parseInt(entry[0], 2)).padStart(
         String(this._max_addr).length,
@@ -132,27 +153,45 @@ class BHT {
     }));
   }
 
+  /**
+   * @returns {Number} - The accuracy of the branch history table
+   */
   get accuracy() {
     if (this._correct + this._incorrect == 0) return 0;
     return this._correct / (this._correct + this._incorrect);
   }
 
+  /**
+   * @returns {string} - The accuracy of the branch history table as a string with 2 decimal places
+   */
   get accuracy_formatted() {
     return (this.accuracy * 100).toFixed(2) + "%";
   }
 
+  /**
+   * @returns {Number} - The Number of correct predictions
+   */
   get correct() {
     return this._correct;
   }
 
+  /**
+   * @returns {Number} - The Number of incorrect predictions
+   */
   get incorrect() {
     return this._incorrect;
   }
 
+  /**
+   * @returns {Number} - The total Number of predictions
+   */
   get total() {
     return this._correct + this._incorrect;
   }
 
+  /**
+   * @returns {Number} - The highest possible address stored in the BHT
+   */
   get max_addr() {
     return this._max_addr;
   }

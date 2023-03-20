@@ -1,3 +1,5 @@
+import { CBP } from "./cbp.js";
+
 class View {
   constructor() {
     this._code = document.querySelector("#code");
@@ -10,6 +12,11 @@ class View {
     this._active_line = 0;
   }
 
+  /**
+   * Set the code to be displayed in the view
+   *
+   * @param {Array[str]} code - the code to be displayed
+   */
   setCode(code) {
     this._code.innerHTML = "";
 
@@ -25,12 +32,46 @@ class View {
     this.setActiveInstruction(0);
   }
 
+  /**
+   * Set the correlating branch predictor to be displayed in the view
+   *
+   * @param {CBP} cbp
+   */
   setCBP(cbp) {
     this._setActiveCBP(cbp);
     this._setHistory(cbp);
     this._setCBPEntries(cbp);
   }
 
+  /**
+   *
+   * @param {Array.<string, Number>} registers
+   * @param {Array.<string, Number>} globals
+   */
+  setMemory(registers, globals) {
+    this._registers.innerHTML = "";
+    this._globals.innerHTML = "";
+    this._setRegisters(registers, this._registers);
+    this._setRegisters(globals, this._globals);
+  }
+
+  /**
+   * Set the active instruction in the view
+   * @param {Number} line_index
+   */
+  setActiveInstruction(line_index) {
+    this._active_line = line_index;
+
+    this._code.querySelectorAll("div").forEach((div, i) => {
+      if (i === line_index) div.classList.add("active");
+      else div.classList.remove("active");
+    });
+  }
+
+  /**
+   * Create the view for the history of the correlating branch predictor
+   * @param {CBP} cbp
+   */
   _setHistory(cbp) {
     this._history.innerHTML = "";
     const history_p = document.createElement("p");
@@ -43,6 +84,12 @@ class View {
     this._history.appendChild(history_value);
   }
 
+  /**
+   * Set the active bht of the cbp to be displayed in the view
+   *
+   * @param {CBP} cbp
+   * @private
+   */
   _setActiveCBP(cbp) {
     this._active_bht.innerHTML = "";
     const active_bht = document.createElement("p");
@@ -55,6 +102,12 @@ class View {
     this._active_bht.appendChild(active_bht_value);
   }
 
+  /**
+   * Show the cbp entries in the view
+   *
+   * @param {CBP} cbp
+   * @private
+   */
   _setCBPEntries(cbp) {
     const div_selector = (i) => `#bht_${i}`;
 
@@ -70,7 +123,7 @@ class View {
         div.innerHTML = "";
       }
 
-      // set the div width as a function of the number of bhts
+      // set the div width as a function of the Number of bhts
       div.style.width = `${100 / cbp.BHTs.length}%`;
 
       const name = document.createElement("p");
@@ -93,7 +146,7 @@ class View {
     cbp.BHTs.forEach((bht, i) => {
       const div = this._predictor.querySelector(div_selector(i));
 
-      bht.entriesFormatted.forEach((entry) => {
+      bht.predictions_formatted.forEach((entry) => {
         const p = document.createElement("p");
         p.textContent = `${entry.address}(${entry.int_address}): ${entry.prediction}`;
         if (
@@ -108,13 +161,12 @@ class View {
     });
   }
 
-  setMemory(registers, globals) {
-    this._registers.innerHTML = "";
-    this._globals.innerHTML = "";
-    this._setRegisters(registers, this._registers);
-    this._setRegisters(globals, this._globals);
-  }
-
+  /**
+   * Set the registers to be displayed in the view
+   * @param {Array.<string, Number>} register
+   * @param {HTMLElement} container
+   * @private
+   */
   _setRegisters(register, container) {
     Object.entries(register).forEach(([key, value]) => {
       const name_p = document.createElement("p");
@@ -129,15 +181,6 @@ class View {
       div.appendChild(name_p);
       div.appendChild(value_p);
       container.appendChild(div);
-    });
-  }
-
-  setActiveInstruction(line_index) {
-    this._active_line = line_index;
-
-    this._code.querySelectorAll("div").forEach((div, i) => {
-      if (i === line_index) div.classList.add("active");
-      else div.classList.remove("active");
     });
   }
 }
