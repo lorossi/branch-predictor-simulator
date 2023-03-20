@@ -17,7 +17,7 @@ class CPU {
     this._ju = new JU(this._registers);
     this._sc = new SC(this._registers);
 
-    this._cbp = new CBP(16, 2, 2);
+    this._cbp = new CBP(4, 2, 2);
   }
 
   load(instructions) {
@@ -96,6 +96,7 @@ class CPU {
       // jumps
       const prediction = this._cbp.predict(this.pc);
       const jump = this._ju.run(opcode, op1, op2, op3);
+
       if (jump) {
         const dest_label = op3 == null ? op1 : op3;
         const dest_addr = this._findLabel(dest_label);
@@ -104,7 +105,9 @@ class CPU {
         this.pc++;
       }
 
-      // console.log(`PC: ${this.pc} Prediction: ${prediction}, Actual: ${jump}`);
+      console.log(
+        `PC: ${this.pc}, BHT: ${this._cbp.activeBHT}, Prediction: ${prediction}, Actual: ${jump}`
+      );
 
       this._cbp.update(this.pc, jump);
     } else {

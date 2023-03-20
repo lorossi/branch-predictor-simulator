@@ -14,6 +14,10 @@ class BHT {
     this._incorrect = 0;
 
     this._prediction = new Map();
+    for (let i = 0; i < this._max_addr; i++) {
+      const addr = this._correctAddressLength(i);
+      this._prediction.set(addr, 0);
+    }
   }
 
   /**
@@ -58,9 +62,6 @@ class BHT {
     if (new_value > this._n) new_value = this._n;
     else if (new_value < 0) new_value = 0;
 
-    if (this._toBool(new_value) == this._toBool(prediction)) this._correct++;
-    else this._incorrect++;
-
     this._prediction.set(address, new_value);
   }
 
@@ -83,9 +84,18 @@ class BHT {
       );
 
     const key = this._correctAddressLength(address);
-    const value = outcome == 1 ? 1 : -1;
+    const value = Boolean(this._getPrediction(key));
 
-    this._setPrediction(key, value);
+    let new_value;
+    if (value === outcome) {
+      this._correct++;
+      new_value = 1;
+    } else {
+      this._incorrect++;
+      new_value = -1;
+    }
+
+    this._setPrediction(key, new_value);
   }
 
   get addresses() {
@@ -103,7 +113,10 @@ class BHT {
   get entriesFormatted() {
     return this.entries.map((entry) => ({
       address: entry[0],
-      int_address: parseInt(entry[0], 2),
+      int_address: String(parseInt(entry[0], 2)).padStart(
+        String(this._max_addr).length,
+        "0"
+      ),
       prediction: entry[1].toString(2).padStart(this._n, "0"),
       bool_prediction: this._toBool(entry[1]),
     }));
@@ -117,6 +130,7 @@ class BHT {
   get accuracy_formatted() {
     return (this.accuracy * 100).toFixed(2) + "%";
   }
+
   get correct() {
     return this._correct;
   }
