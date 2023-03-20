@@ -136,6 +136,10 @@ class CPU {
     return this._instructions[this.pc];
   }
 
+  get cbp() {
+    return this._cbp;
+  }
+
   get isa() {
     return this._alu.operations
       .concat(this._mu.operations)

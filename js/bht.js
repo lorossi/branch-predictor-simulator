@@ -96,13 +96,37 @@ class BHT {
     return [...this._prediction.values()].sort();
   }
 
-  get pairs() {
+  get entries() {
     return [...this._prediction.entries()].sort();
+  }
+
+  get entriesFormatted() {
+    return this.entries.map((entry) => ({
+      address: entry[0],
+      int_address: parseInt(entry[0], 2),
+      prediction: entry[1].toString(2).padStart(this._n, "0"),
+      bool_prediction: this._toBool(entry[1]),
+    }));
   }
 
   get accuracy() {
     if (this._correct + this._incorrect == 0) return 0;
     return this._correct / (this._correct + this._incorrect);
+  }
+
+  get accuracy_formatted() {
+    return (this.accuracy * 100).toFixed(2) + "%";
+  }
+  get correct() {
+    return this._correct;
+  }
+
+  get incorrect() {
+    return this._incorrect;
+  }
+
+  get total() {
+    return this._correct + this._incorrect;
   }
 }
 

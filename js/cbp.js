@@ -48,6 +48,18 @@ class CBP {
       1
     );
   }
+
+  get BHTs() {
+    return this._BHTs;
+  }
+
+  get activeBHT() {
+    return this._history.get();
+  }
+
+  get history() {
+    return this._history.history.join("").padStart(this._m, "0");
+  }
 }
 
 class History {
@@ -64,6 +76,10 @@ class History {
 
   get() {
     return parseInt(this._history.join(""), 2);
+  }
+
+  get history() {
+    return [...this._history];
   }
 }
 
