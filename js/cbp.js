@@ -21,6 +21,7 @@ class CBP {
       .map(() => new BHT(k, n));
 
     this._history = new History(m);
+    this._last_prediction = null;
   }
 
   /**
@@ -49,6 +50,7 @@ class CBP {
    *
    * @param {Number} address - The address of the branch
    * @param {Boolean} outcome - The outcome of the branch
+   * @returns {Boolean} The old prediction of the branch
    * @throws {Error} If the outcome is not a boolean
    */
   update(address, outcome) {
@@ -59,8 +61,10 @@ class CBP {
       );
 
     const key = this._history.get();
-    this._BHTs[key].update(address, outcome);
+    const old_prediction = this._BHTs[key].update(address, outcome);
     this._history.update(outcome);
+
+    return old_prediction;
   }
 
   /**
@@ -73,6 +77,23 @@ class CBP {
       (acc, bht) => (bht.accuracy == 0 ? 1 : bht.accuracy) * acc,
       1
     );
+  }
+
+  /**
+   * Get the formatted accuracy of the CBP.
+   * The formatted accuracy is the product of the formatted accuracy of each BHT.
+   * @return {string}
+   * @readonly
+   */
+  get accuracy_formatted() {
+    return (
+      this._BHTs.reduce(
+        (acc, bht) => (bht.accuracy == 0 ? 1 : bht.accuracy) * acc,
+        1
+      ) * 100
+    )
+      .toFixed(2)
+      .concat("%");
   }
 
   /**

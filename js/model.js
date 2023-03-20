@@ -99,6 +99,15 @@ class Model {
   get cbp() {
     return this._cpu.cbp;
   }
+
+  /**
+   * Get the CPU.
+   * @returns {CPU}
+   * @readonly
+   */
+  get cpu() {
+    return this._cpu;
+  }
 }
 
 export { Model };

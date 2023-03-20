@@ -3,6 +3,7 @@
     "ADDI",
     "ANDI",
     "BHTs",
+    "divs",
     "globl",
     "MFHI",
     "MFLO",

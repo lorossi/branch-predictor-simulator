@@ -1,4 +1,5 @@
 import { CBP } from "./cbp.js";
+import { CPU } from "./cpu.js";
 
 class View {
   constructor() {
@@ -8,6 +9,8 @@ class View {
     this._predictor = document.querySelector(".predictor");
     this._active_bht = document.querySelector(".bht");
     this._history = document.querySelector(".history");
+    this._prediction = document.querySelector(".prediction");
+    this._accuracy = document.querySelector(".accuracy");
 
     this._active_line = 0;
   }
@@ -36,10 +39,13 @@ class View {
    * Set the correlating branch predictor to be displayed in the view
    *
    * @param {CBP} cbp
+   * @param {CPU} cpu
    */
-  setCBP(cbp) {
-    this._setActiveCBP(cbp);
+  setCBP(cbp, cpu) {
     this._setHistory(cbp);
+    this._setPrediction(cpu);
+    this._setActiveBHT(cbp);
+    this._setAccuracy(cbp);
     this._setCBPEntries(cbp);
   }
 
@@ -85,12 +91,46 @@ class View {
   }
 
   /**
+   * Create the view for the last prediction of the correlating branch predictor
+   * @param {CPU} cpu
+   * @private
+   */
+  _setPrediction(cpu) {
+    this._prediction.innerHTML = "";
+    const prediction_p = document.createElement("p");
+    prediction_p.textContent = "Last prediction:";
+    prediction_p.classList.add("name");
+    this._prediction.appendChild(prediction_p);
+
+    const last_prediction =
+      cpu.last_prediction == null
+        ? "N/A"
+        : cpu.last_prediction
+        ? "Taken"
+        : "Not taken";
+
+    const last_outcome =
+      cpu.last_outcome == null
+        ? "N/A"
+        : cpu.last_outcome == cpu.last_prediction
+        ? "Correct"
+        : "Incorrect";
+
+    const last_branch_address =
+      cpu.last_branch_address == null ? "N/A" : cpu.last_branch_address;
+
+    const prediction_value = document.createElement("p");
+    prediction_value.textContent = `${last_prediction} (${last_outcome}), line ${last_branch_address}`;
+    this._prediction.appendChild(prediction_value);
+  }
+
+  /**
    * Set the active bht of the cbp to be displayed in the view
    *
    * @param {CBP} cbp
    * @private
    */
-  _setActiveCBP(cbp) {
+  _setActiveBHT(cbp) {
     this._active_bht.innerHTML = "";
     const active_bht = document.createElement("p");
     active_bht.textContent = "Active BHT:";
@@ -159,6 +199,18 @@ class View {
         div.appendChild(p);
       });
     });
+  }
+
+  _setAccuracy(cbp) {
+    this._accuracy.innerHTML = "";
+    const accuracy_p = document.createElement("p");
+    accuracy_p.textContent = "Accuracy:";
+    accuracy_p.classList.add("name");
+    this._accuracy.appendChild(accuracy_p);
+
+    const accuracy_value = document.createElement("p");
+    accuracy_value.textContent = cbp.accuracy_formatted;
+    this._accuracy.appendChild(accuracy_value);
   }
 
   /**

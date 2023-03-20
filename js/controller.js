@@ -9,9 +9,10 @@ class Controller {
     document
       .querySelector("#run_one")
       .addEventListener("click", this.runOne.bind(this));
-    document.querySelector("#run_all").addEventListener("click", () => {
-      this.runAll().bind(this);
-    });
+
+    document
+      .querySelector("#run_all")
+      .addEventListener("click", this.runAll.bind(this));
   }
 
   /**
@@ -74,7 +75,7 @@ class Controller {
   _updateView() {
     this._view.setActiveInstruction(this._model.current_line);
     this._view.setMemory(this._model.registers, this._model.global);
-    this._view.setCBP(this._model.cbp);
+    this._view.setCBP(this._model.cbp, this._model.cpu);
   }
 }
 

@@ -42,6 +42,8 @@ body {
 
 .predictor,
 .history,
+.prediction,
+.accuracy,
 .bht {
   display: flex;
   flex-direction: row;

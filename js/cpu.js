@@ -17,6 +17,10 @@ class CPU {
     this._ju = new JU(this._registers);
     this._sc = new SC(this._registers);
 
+    this._last_prediction = null;
+    this._last_outcome = null;
+    this._last_branch_address = null;
+
     this._cbp = new CBP(4, 2, 2);
   }
 
@@ -142,9 +146,9 @@ class CPU {
     } else if (this._ju.operations.includes(opcode)) {
       // jumps
       const prediction = this._cbp.predict(this.pc);
-      const jump = this._ju.run(opcode, op1, op2, op3);
+      const outcome = this._ju.run(opcode, op1, op2, op3);
 
-      if (jump) {
+      if (outcome) {
         const dest_label = op3 == null ? op1 : op3;
         const dest_addr = this._findLabel(dest_label);
         this.pc = dest_addr;
@@ -152,11 +156,11 @@ class CPU {
         this.pc++;
       }
 
-      console.log(
-        `PC: ${this.pc}, BHT: ${this._cbp.activeBHT}, Prediction: ${prediction}, Actual: ${jump}`
-      );
+      this._last_prediction = prediction;
+      this._last_outcome = outcome;
+      this._last_branch_address = this.pc;
 
-      this._cbp.update(this.pc, jump);
+      this._cbp.update(this.pc, outcome);
     } else {
       throw new Error(`Operation ${opcode} not found`);
     }
@@ -234,6 +238,33 @@ class CPU {
       .concat(this._ju.operations)
       .concat(this._sc.operations)
       .concat(["NOP"]);
+  }
+
+  /**
+   * Get the last prediction of the branch predictor.
+   * @returns {boolean} the last prediction of the branch predictor
+   * @readonly
+   */
+  get last_prediction() {
+    return this._last_prediction;
+  }
+
+  /**
+   * Get the last outcome of a branch.
+   * @returns {boolean} true if the branch was taken, false otherwise
+   * @readonly
+   */
+  get last_outcome() {
+    return this._last_outcome;
+  }
+
+  /**
+   * Get the address of the last branch.
+   * @returns {number} the address of the last branch
+   * @readonly
+   */
+  get last_branch_address() {
+    return this._last_branch_address;
   }
 }
 

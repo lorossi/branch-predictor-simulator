@@ -88,6 +88,7 @@ class BHT {
    *
    * @param {integer} address
    * @param {boolean} outcome
+   * @returns {boolean} true if the prediction was correct, false otherwise
    */
   update(address, outcome) {
     if (typeof outcome !== "boolean")
@@ -109,6 +110,7 @@ class BHT {
     }
 
     this._setPrediction(key, new_value);
+    return this._toBool(value);
   }
 
   /**
