@@ -24,10 +24,34 @@
     <div class="container">
       <div class="cbp">
         <div class="controls">
-          <button id="run_one">Run one instruction</button>
-          <button id="run_all">Run</button>
-          <button id="upload_code_button">Upload code</button>
-          <input type="file" id="upload_code" />
+          <div class="group">
+            <button id="run_one">Run one instruction</button>
+            <button id="run_all">Run all instructions</button>
+            <button id="reset">Reset</button>
+            <button id="upload_code_button">Upload code</button>
+          </div>
+          <div class="group">
+            <input type="number" id="bht_k" value="4" min="1" max="16" />
+            <button id="reset_change">
+              Set number of LSBs used for addressing in the BHP
+            </button>
+          </div>
+          <div class="group">
+            <input type="number" id="cbp_n" value="2" min="1" max="16" />
+            <button id="reset_change">
+              Set number of bits inside each BHT entry
+            </button>
+          </div>
+
+          <div class="group">
+            <input type="number" id="cbp_m" value="2" min="1" , max="4" />
+            <button id="reset_change">
+              Set number of bits used to represent the history in the CBP
+            </button>
+          </div>
+          <div class="group">
+            <input type="file" id="upload_code" />
+          </div>
         </div>
         <div class="history"></div>
         <div class="bht"></div>
