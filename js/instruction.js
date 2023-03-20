@@ -1,18 +1,18 @@
 class Instruction {
-  constructor(opcode, op1, op2, op3, label, data = null) {
+  constructor(opcode, op1, op2, op3, label, global = null) {
     this._opcode = this._formatOperand(opcode);
     this._op1 = this._formatOperand(op1);
     this._op2 = this._formatOperand(op2);
     this._op3 = this._formatOperand(op3);
     this._label = this._formatOperand(label);
 
-    if (data != null) this._global = [...data];
+    if (global != null) this._global = [...global];
     else this._global = [];
   }
 
   /**
    * Matches a section declaration
-   * e.g. .text, .data, .bss
+   * e.g. .text, .global, .bss
    *
    *
    * @param {String} str
@@ -147,7 +147,7 @@ class Instruction {
     let str = "";
     if (this._label) str += `${this._label}: `;
 
-    if (this.hasData) {
+    if (this.hasGlobal) {
       switch (this._opcode) {
         case ".word":
           str += `${this._opcode} ${this._global.join(", ")}`;
@@ -181,7 +181,7 @@ class Instruction {
     return [this._op1, this._op2, this._op3];
   }
 
-  get data() {
+  get global() {
     return this._global;
   }
 
@@ -201,7 +201,7 @@ class Instruction {
     return this._label != null && this._opcode == null;
   }
 
-  get hasData() {
+  get hasGlobal() {
     return this._global.length > 0;
   }
 }

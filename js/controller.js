@@ -19,13 +19,13 @@ class Controller {
   setCode(code) {
     this._model.setCode(code);
     this._view.setCode(code);
-    this._view.setMemory(this._model.registers, this._model.data);
+    this._view.setMemory(this._model.registers, this._model.global);
   }
 
   runOne() {
     this._model.runOne();
     this._view.setActiveLine(this._model.current_line);
-    this._view.setMemory(this._model.registers, this._model.data);
+    this._view.setMemory(this._model.registers, this._model.global);
   }
 }
 

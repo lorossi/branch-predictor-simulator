@@ -76,9 +76,9 @@ class CPU {
     if (opcode === "nop" || instruction.isSection || instruction.isLabel) {
       // no operation
       this.pc++;
-    } else if (instruction.hasData) {
-      // data or space
-      this._registers.setDataByLabel(instruction.label, instruction.data);
+    } else if (instruction.hasGlobal) {
+      // global or space
+      this._registers.setGlobalByLabel(instruction.label, instruction.global);
       this.pc++;
     } else if (this._alu.operations.includes(opcode)) {
       // arithmetic and logic operations

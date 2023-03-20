@@ -72,7 +72,7 @@ class Registers {
     this._registers.set(reg, v);
   }
 
-  getDataByLabel(label) {
+  getGlobalByLabel(label) {
     if (!this._registers.get("addr").has(label))
       throw new Error(`Label ${label} not found`);
 
@@ -80,21 +80,21 @@ class Registers {
     return this._registers.get("global")[addr];
   }
 
-  getDataByAddress(addr) {
+  getGlobalByAddress(addr) {
     if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
 
     return this._registers.get("global")[addr];
   }
 
-  setDataByLabel(label, global) {
+  setGlobalByLabel(label, global) {
     const addr = this._registers.get("global").length;
     this._registers.get("global").push(...global);
     this._registers.get("addr").set(label, addr);
     return addr;
   }
 
-  setDataByAddress(addr, global) {
+  setGlobalByAddress(addr, global) {
     if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
 
@@ -309,7 +309,7 @@ class MU extends Unit {
   _lw(op1, imm, op2) {
     const v2 = this._registers.get(op2);
     const address = Math.floor(v2 / this._registers.addr_increment + imm);
-    const global = this._registers.getDataByAddress(address);
+    const global = this._registers.getGlobalByAddress(address);
 
     this._registers.set(op1, global);
   }
@@ -318,7 +318,7 @@ class MU extends Unit {
     const v1 = this._registers.get(op1);
     const v3 = this._registers.get(op3);
     const address = Math.floor(v3 / 4 + imm);
-    this._registers.setDataByAddress(address, v1);
+    this._registers.setGlobalByAddress(address, v1);
   }
 
   _li(op1, v1) {

@@ -30,7 +30,7 @@ class Model {
 
   get global() {
     const entries = [...this._cpu.global["addr"].entries()];
-    const values = [...this._cpu.global["data"]];
+    const values = [...this._cpu.global["global"]];
     const out = {};
 
     for (let i = 0; i < entries.length; i++) {
@@ -47,7 +47,7 @@ class Model {
     return this._cpu.pc;
   }
 
-  get data() {
+  get global() {
     return this._cpu.global;
   }
 
