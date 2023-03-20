@@ -6,8 +6,8 @@ class Instruction {
     this._op3 = this._formatOperand(op3);
     this._label = this._formatOperand(label);
 
-    if (data != null) this._data = [...data];
-    else this._data = [];
+    if (data != null) this._global = [...data];
+    else this._global = [];
   }
 
   /**
@@ -150,10 +150,10 @@ class Instruction {
     if (this.hasData) {
       switch (this._opcode) {
         case ".word":
-          str += `${this._opcode} ${this._data.join(", ")}`;
+          str += `${this._opcode} ${this._global.join(", ")}`;
           break;
         case ".space":
-          str += `${this._opcode} ${this._data.length}`;
+          str += `${this._opcode} ${this._global.length}`;
           break;
       }
     } else if (this._opcode) str += `${this._opcode}`;
@@ -182,14 +182,14 @@ class Instruction {
   }
 
   get data() {
-    return this._data;
+    return this._global;
   }
 
   get isSection() {
     return (
       this._opcode != null &&
       this._opcode.startsWith(".") &&
-      this._data.length == 0
+      this._global.length == 0
     );
   }
 
@@ -202,7 +202,7 @@ class Instruction {
   }
 
   get hasData() {
-    return this._data.length > 0;
+    return this._global.length > 0;
   }
 }
 

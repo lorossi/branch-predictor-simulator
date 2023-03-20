@@ -38,7 +38,7 @@ class Registers {
     this._registers.set("$hi", 0);
     this._registers.set("$lo", 0);
 
-    this._registers.set("data", []);
+    this._registers.set("global", []);
     this._registers.set("addr", new Map());
   }
 
@@ -77,28 +77,28 @@ class Registers {
       throw new Error(`Label ${label} not found`);
 
     const addr = this._registers.get("addr").get(label);
-    return this._registers.get("data")[addr];
+    return this._registers.get("global")[addr];
   }
 
   getDataByAddress(addr) {
-    if (addr >= this._registers.get("data").length)
+    if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
 
-    return this._registers.get("data")[addr];
+    return this._registers.get("global")[addr];
   }
 
-  setDataByLabel(label, data) {
-    const addr = this._registers.get("data").length;
-    this._registers.get("data").push(...data);
+  setDataByLabel(label, global) {
+    const addr = this._registers.get("global").length;
+    this._registers.get("global").push(...global);
     this._registers.get("addr").set(label, addr);
     return addr;
   }
 
-  setDataByAddress(addr, data) {
-    if (addr >= this._registers.get("data").length)
+  setDataByAddress(addr, global) {
+    if (addr >= this._registers.get("global").length)
       throw new Error(`Address ${addr} not found`);
 
-    this._registers.get("data")[addr] = data;
+    this._registers.get("global")[addr] = global;
   }
 
   getAddressByLabel(label) {
@@ -116,7 +116,7 @@ class Registers {
     return registers;
   }
 
-  get memory() {
+  get global() {
     let registers = {};
     for (let [key, value] of this._registers) {
       if (!key.includes("$")) registers[key] = value;
@@ -289,8 +289,8 @@ class ALU extends Unit {
  * @class MU
  * @extends Unit
  * @description
- * This class represents the Memory Unit of the CPU.
- * All the memory-related operations are defined and performed here.
+ * This class represents the global Unit of the CPU.
+ * All the global-related operations are defined and performed here.
  */
 class MU extends Unit {
   constructor(registers) {
@@ -309,9 +309,9 @@ class MU extends Unit {
   _lw(op1, imm, op2) {
     const v2 = this._registers.get(op2);
     const address = Math.floor(v2 / this._registers.addr_increment + imm);
-    const data = this._registers.getDataByAddress(address);
+    const global = this._registers.getDataByAddress(address);
 
-    this._registers.set(op1, data);
+    this._registers.set(op1, global);
   }
 
   _sw(op1, imm, op3) {

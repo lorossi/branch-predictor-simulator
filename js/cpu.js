@@ -120,8 +120,8 @@ class CPU {
     return this._registers.registers;
   }
 
-  get memory() {
-    return this._registers.memory;
+  get global() {
+    return this._registers.global;
   }
 
   get pc() {
