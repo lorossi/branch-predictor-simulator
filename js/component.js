@@ -108,6 +108,14 @@ class Registers {
     return this._registers.get("addr").get(label);
   }
 
+  reset() {
+    for (let [key, _] of this._registers) {
+      if (key.includes("$") && key != "$zero") this._registers.set(key, 0);
+      else if (key == "global") this._registers.set(key, []);
+      else if (key == "addr") this._registers.set(key, new Map());
+    }
+  }
+
   get registers() {
     let registers = {};
     for (let [key, value] of this._registers) {

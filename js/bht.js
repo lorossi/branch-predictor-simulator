@@ -98,6 +98,16 @@ class BHT {
     this._setPrediction(key, new_value);
   }
 
+  reset() {
+    this._correct = 0;
+    this._incorrect = 0;
+
+    for (let i = 0; i < this._max_addr; i++) {
+      const addr = this._correctAddressLength(i);
+      this._prediction.set(addr, 0);
+    }
+  }
+
   get addresses() {
     return [...this._prediction.keys()].sort();
   }
@@ -141,6 +151,10 @@ class BHT {
 
   get total() {
     return this._correct + this._incorrect;
+  }
+
+  get max_addr() {
+    return this._max_addr;
   }
 }
 

@@ -23,6 +23,11 @@ class CBP {
     this._history = new History(m);
   }
 
+  reset() {
+    this._BHTs.forEach((bht) => bht.reset());
+    this._history.reset();
+  }
+
   predict(address) {
     const key = this._history.get();
     const value = this._BHTs[key].predict(address);
@@ -72,6 +77,10 @@ class History {
     const v = value ? 1 : 0;
     this._history.shift();
     this._history.push(v);
+  }
+
+  reset() {
+    this._history = Array(this._m).fill(0);
   }
 
   get() {
