@@ -47,10 +47,6 @@ class Model {
     return this._cpu.pc;
   }
 
-  get global() {
-    return this._cpu.global;
-  }
-
   get registers() {
     return this._cpu.registers;
   }
