@@ -22,16 +22,15 @@ class Model {
 
   runOne() {
     this._cpu.runOne();
-    this._view.setActiveLine(this._cpu.pc);
   }
 
   get registers() {
     return this._cpu.registers;
   }
 
-  get memory() {
-    const entries = [...this._cpu.memory["addr"].entries()];
-    const values = [...this._cpu.memory["data"]];
+  get global() {
+    const entries = [...this._cpu.global["addr"].entries()];
+    const values = [...this._cpu.global["data"]];
     const out = {};
 
     for (let i = 0; i < entries.length; i++) {
@@ -42,6 +41,18 @@ class Model {
     }
 
     return out;
+  }
+
+  get current_line() {
+    return this._cpu.pc;
+  }
+
+  get data() {
+    return this._cpu.global;
+  }
+
+  get registers() {
+    return this._cpu.registers;
   }
 }
 
