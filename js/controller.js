@@ -15,6 +15,16 @@ class Controller {
       .addEventListener("click", this.runAll.bind(this));
 
     document
+      .querySelector("#reset")
+      .addEventListener("click", this.reset.bind(this));
+
+    document
+      .querySelectorAll("#reset_change")
+      .forEach((element) =>
+        element.addEventListener("click", this.reset.bind(this))
+      );
+
+    document
       .querySelector("#upload_code_button")
       .addEventListener("click", () => {
         document.querySelector("#upload_code").click();
@@ -39,6 +49,7 @@ class Controller {
    * Reset the model and view to their initial state.
    */
   reset() {
+    this._model.setCBP(...this._getModelValues());
     this._model.reset();
     this._updateView();
   }
@@ -50,6 +61,7 @@ class Controller {
    */
   setModel(model) {
     this._model = model;
+    this._model.setCBP(...this._getModelValues());
   }
 
   /**
@@ -96,6 +108,18 @@ class Controller {
     this._view.setActiveInstruction(this._model.current_line);
     this._view.setMemory(this._model.registers, this._model.global);
     this._view.setCBP(this._model.cbp, this._model.cpu);
+  }
+
+  _getModelValues() {
+    const k = document.querySelector("#bht_k").value;
+    const n = document.querySelector("#cbp_n").value;
+    const m = document.querySelector("#cbp_m").value;
+    return [k, n, m];
+  }
+
+  _setModelValues(n, k, m) {
+    this._model.setCBP(n, k, m);
+    this.reset();
   }
 }
 

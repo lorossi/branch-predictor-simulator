@@ -10,6 +10,17 @@ class Model {
   }
 
   /**
+   * Set the values of n, k and m.
+   * @param {Number} k - number of LSB of the PC used as the address of the BHT
+   * @param {Number} n - number of bits used to represent the history
+   * @param {Number} m - number of bits in each entry of the BHT
+   */
+  setCBP(k, n, m) {
+    this._cpu.setCBP(k, n, m);
+    this.reset();
+  }
+
+  /**
    * Reset the CPU.
    */
   reset() {

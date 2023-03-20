@@ -8,6 +8,9 @@ import { CBP } from "./cbp.js";
  * This class represents the CPU of the simulated machine.
  */
 class CPU {
+  /**
+   * Create a new CPU.
+   */
   constructor() {
     this._instructions = [];
 
@@ -20,8 +23,16 @@ class CPU {
     this._last_prediction = null;
     this._last_outcome = null;
     this._last_branch_address = null;
+  }
 
-    this._cbp = new CBP(4, 2, 2);
+  /**
+   * Set the CPB of the CPU.
+   * @param {Number} k - number of LSB of the PC used as the address of the BHT
+   *  @param {Number} n - number of BHT in hte CBP
+   * @param {Number} m - number of bits in each entry of the BHT
+   */
+  setCBP(k, n, m) {
+    this._cbp = new CBP(k, n, m);
   }
 
   /**

@@ -150,21 +150,20 @@ class View {
    */
   _setCBPEntries(cbp) {
     const div_selector = (i) => `#bht_${i}`;
+    const divs = [];
+
+    // remove all the divs
+    this._predictor
+      .querySelectorAll("div")
+      .forEach((div) => div.parentNode.removeChild(div));
 
     // create and empty the divs
     cbp.BHTs.forEach((bht, i) => {
-      let div = this._predictor.querySelector(div_selector(i));
-
-      if (div === null) {
-        div = document.createElement("div");
-        div.id = `bht_${i}`;
-        this._predictor.appendChild(div);
-      } else {
-        div.innerHTML = "";
-      }
-
+      const div = document.createElement("div");
+      div.id = div_selector(i);
       // set the div width as a function of the Number of bhts
       div.style.width = `${100 / cbp.BHTs.length}%`;
+      this._predictor.appendChild(div);
 
       const name = document.createElement("p");
       name.textContent = `BHT ${i}`;
@@ -180,11 +179,13 @@ class View {
       stats.textContent = `Predictions: ${bht.correct}/${bht.total} \
       (${bht.accuracy_formatted})`;
       div.appendChild(stats);
+
+      divs.push(div);
     });
 
     // fill the divs with the entries
     cbp.BHTs.forEach((bht, i) => {
-      const div = this._predictor.querySelector(div_selector(i));
+      const div = divs[i];
 
       bht.predictions_formatted.forEach((entry) => {
         const p = document.createElement("p");
