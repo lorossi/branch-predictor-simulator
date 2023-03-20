@@ -14,7 +14,6 @@
     <script type="module" src="js/instruction.js"></script>
     <script type="module" src="js/component.js"></script>
     <script type="module" src="js/cpu.js"></script>
-    <script type="module" src="js/canvas.js"></script>
     <script type="module" src="js/model.js"></script>
     <script type="module" src="js/view.js"></script>
     <script type="module" src="js/controller.js"></script>
@@ -23,13 +22,15 @@
 
   <body>
     <div class="container">
-      <div class="canvas">
+      <div class="cbp">
         <button id="run_one">Run one instruction</button>
-        <canvas id="canvas" width="100" height="100"></canvas>
+        <div class="bht"></div>
+        <div class="history"></div>
+        <div class="predictor"></div>
       </div>
       <div class="memory">
-        <div class="globals"></div>
         <div class="registers"></div>
+        <div class="globals"></div>
       </div>
       <div class="code">
         <div id="code"></div>
