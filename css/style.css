@@ -3,6 +3,10 @@
   padding: 0;
 }
 
+body {
+  font-size: 12px;
+}
+
 .container {
   display: flex;
   width: 100vw;
@@ -11,6 +15,11 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+
+  padding-top: 2vh;
+  padding-bottom: 2vh;
+  padding-left: 2vw;
+  padding-right: 2vw;
 }
 
 .container > div {
@@ -31,20 +40,25 @@
   width: 25%;
 }
 
-.predictor {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  width: 100%;
-  font-family: monospace;
-}
-
+.predictor,
 .history,
 .bht {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   font-family: monospace;
+}
+
+.controls {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+.controls > button {
+  padding-left: 2px;
+  padding-right: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .predictor > div {
@@ -56,11 +70,14 @@
   align-items: flex-start;
 }
 
-.bht .name,
-.history .name,
-.predictor .name {
+.name {
   font-weight: bold;
+  padding-left: 2px;
   padding-right: 2px;
+}
+
+.active {
+  background-color: #b3b3b3;
 }
 
 .memory {
@@ -93,22 +110,12 @@
   margin-bottom: 2px;
 }
 
-.cell .name {
-  padding-right: 2px;
-  font-family: monospace;
-  font-weight: bold;
-}
-
 .code {
   font-family: monospace;
 }
 
 .code > div {
   display: inline-block;
-}
-
-.active {
-  background-color: #b3b3b3;
 }
 
 input[type="file"] {
