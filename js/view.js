@@ -11,11 +11,12 @@ class View {
   }
 
   setCode(code) {
+    const pad_length = String(code.length).length;
     code
       .filter((line) => line.length > 0)
-      .forEach((line) => {
+      .forEach((line, i) => {
         const div = document.createElement("div");
-        div.textContent = line;
+        div.textContent = `${String(i).padStart(pad_length, "0")}\t${line}`;
         this._code.appendChild(div);
       });
 
