@@ -13,6 +13,26 @@ class Controller {
     document
       .querySelector("#run_all")
       .addEventListener("click", this.runAll.bind(this));
+
+    document
+      .querySelector("#upload_code_button")
+      .addEventListener("click", () => {
+        document.querySelector("#upload_code").click();
+      });
+
+    // open file and set it as the code
+    document.querySelector("#upload_code").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener("load", (e) => {
+        const code = e.target.result.split("\n");
+        this.reset();
+        this.setCode(code);
+      });
+
+      reader.readAsText(file);
+    });
   }
 
   /**

@@ -35,26 +35,6 @@ const main = () => {
     "jump loop",
     "end:",
   ]);
-
-  document
-    .querySelector("#upload_code_button")
-    .addEventListener("click", () => {
-      document.querySelector("#upload_code").click();
-    });
-
-  // open file and set it as the code
-  document.querySelector("#upload_code").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.addEventListener("load", (e) => {
-      const code = e.target.result.split("\n");
-      controller.reset();
-      controller.setCode(code);
-    });
-
-    reader.readAsText(file);
-  });
 };
 
 document.addEventListener("DOMContentLoaded", main);
