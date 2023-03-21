@@ -210,7 +210,7 @@ class View {
     this._accuracy.appendChild(accuracy_p);
 
     const accuracy_value = document.createElement("p");
-    accuracy_value.textContent = cbp.accuracy_formatted;
+    accuracy_value.textContent = `${cbp.accuracy_formatted} (${cbp.correct}/${cbp.total})`;
     this._accuracy.appendChild(accuracy_value);
   }
 
