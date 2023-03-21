@@ -39,7 +39,7 @@ class Instruction {
    * @static
    */
   static _matchSpace(str) {
-    const match = /^([a-zA-Z]+):\s\.space\s([0-9]+)$/.exec(str);
+    const match = /^([a-zA-Z_0-9]+):\s\.space\s([0-9]+)$/.exec(str);
     if (match) {
       const length = Array(parseInt(match[2])).fill(0);
       return new Instruction(".space", null, null, null, match[1], length);
@@ -57,7 +57,7 @@ class Instruction {
    * @static
    */
   static _matchWord(str) {
-    const match = /^([a-zA-Z]+):\s\.word\s(([0-9]+\s*)+)$/.exec(str);
+    const match = /^([a-zA-Z_0-9]+):\s\.word\s(([0-9]+\s*)+)$/.exec(str);
     if (match) {
       const values = match[2].split(" ").map((v) => parseInt(v));
       return new Instruction(".word", null, null, null, match[1], values);
@@ -75,7 +75,7 @@ class Instruction {
    * @static
    */
   static _matchLabel(str) {
-    const match = /^([a-zA-Z]+):\s*$/.exec(str);
+    const match = /^([a-zA-Z_0-9]+):\s*$/.exec(str);
     if (match) return new Instruction(null, null, null, null, match[1]);
     return null;
   }
@@ -91,7 +91,7 @@ class Instruction {
    */
   static _matchLwSw(str) {
     const match =
-      /(lw|sw)\s([$a-zA-Z0-9]+),\s([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
+      /(lw|sw)\s([$a-zA-Z_0-9]+),\s([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
     if (match) return new Instruction(match[1], match[2], match[3], match[4]);
 
     return null;
@@ -108,7 +108,7 @@ class Instruction {
    */
   static _matchInstruction(str) {
     const matches =
-      /(?:([a-zA-Z_]+):\s+)?([a-zA-Z_]+)\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z0-9]+)?/.exec(
+      /(?:([a-zA-Z_0-9]+):\s+)?([a-zA-Z_]+)\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z0-9]+)?,?\s*([$a-zA-Z_0-9]+)?/.exec(
         str
       );
 
