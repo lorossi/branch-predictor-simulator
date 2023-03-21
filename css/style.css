@@ -28,6 +28,7 @@ body {
   height: 100%;
   border-right: 1px solid black;
   padding: 10px;
+  overflow-y: scroll;
 }
 
 .container > div:nth-child(1) {
@@ -141,7 +142,7 @@ input[type="number"] {
 }
 
 .footer {
-  position: fixed;
+  position: absolute;
   bottom: 0.5vh;
   left: 0.5vw;
   font-size: 20px;
