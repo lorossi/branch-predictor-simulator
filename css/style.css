@@ -5,6 +5,8 @@
 
 body {
   font-size: 12px;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .container {
@@ -49,6 +51,10 @@ body {
   flex-direction: row;
   justify-content: flex-start;
   font-family: monospace;
+}
+
+.predictor {
+  flex-wrap: wrap;
 }
 
 .controls {
@@ -132,4 +138,21 @@ input[type="number"] {
 
 .code > div {
   display: inline-block;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0.5vh;
+  left: 0.5vw;
+  font-size: 20px;
+  font-family: monospace;
+}
+
+a,
+a:active {
+  color: black;
+}
+
+a:visited {
+  color: rgb(42, 42, 42);
 }
