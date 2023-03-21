@@ -49,8 +49,9 @@ class Registers {
    * @returns {Number}
    */
   _wrap(val) {
-    while (val > this._max_val) return val - this._max_val;
-    while (val < this._min_val) return val + this._max_val;
+    if (val > this._max_val) val %= this._max_val;
+    if (val < this._min_val) val %= this._min_val;
+
     return val;
   }
 
