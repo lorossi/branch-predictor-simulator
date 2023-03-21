@@ -14,9 +14,12 @@ const main = () => {
   controller.setCode([
     ".text",
     "LI $t0, 1000",
+    "LI $t2, 1",
     "LOOP:",
+    "ADD $t2, $t2, $t2",
     "LI $t1, 100",
     "LOOP2:",
+    "MUL $t2, $t2, $t1",
     "SUBI $t1, $t1, 1",
     "BNE $t1, $zero, LOOP2",
     "SUBI $t0, $t0, 1",
