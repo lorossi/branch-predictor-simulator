@@ -86,7 +86,8 @@ class View {
     this._history.appendChild(history_p);
 
     const history_value = document.createElement("p");
-    history_value.textContent = cbp.history;
+    const history = cbp.history.length > 0 ? cbp.history : "N/A";
+    history_value.textContent = history;
     this._history.appendChild(history_value);
   }
 

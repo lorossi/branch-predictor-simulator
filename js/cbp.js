@@ -198,6 +198,7 @@ class History {
    * @readonly
    */
   get() {
+    if (this._m == 0) return 0;
     return parseInt(this._history.join(""), 2);
   }
 
@@ -207,6 +208,7 @@ class History {
    * @readonly
    */
   get history() {
+    if (this._m == 0) return [];
     return [...this._history];
   }
 }
