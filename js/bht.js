@@ -98,16 +98,11 @@ class BHT {
       );
 
     const key = this._correctAddressLength(address);
-    const value = Boolean(this._getPrediction(key));
+    const value = this._toBool(this._getPrediction(key));
+    const new_value = outcome ? value + 1 : value - 1;
 
-    let new_value;
-    if (value === outcome) {
-      this._correct++;
-      new_value = 1;
-    } else {
-      this._incorrect++;
-      new_value = -1;
-    }
+    if (value === outcome) this._correct++;
+    else this._incorrect++;
 
     this._setPrediction(key, new_value);
     return this._toBool(value);

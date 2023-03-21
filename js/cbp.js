@@ -62,15 +62,44 @@ class CBP {
 
     const key = this._history.get();
     const old_prediction = this._BHTs[key].update(address, outcome);
+
     this._history.update(outcome);
 
     return old_prediction;
   }
 
   /**
+   * Get the number of correct predictions of the CBP
+   * @return {Number}
+   * @readonly
+   */
+  get correct() {
+    return this._BHTs.reduce((acc, bht) => bht.correct + acc, 0);
+  }
+
+  /**
+   * Get the number of incorrect predictions of the CBP
+   * @return {Number}
+   * @readonly
+   */
+  get incorrect() {
+    return this._BHTs.reduce((acc, bht) => bht.incorrect + acc, 0);
+  }
+
+  /**
+   * Get the total number of predictions of the CBP
+   * @return {Number}
+   * @readonly
+   */
+  get total() {
+    return this.correct + this.incorrect;
+  }
+
+  /**
    * Get the accuracy of the CBP.
    * The accuracy is the product of the accuracy of each BHT.
    * @return {Number}
+   * @readonly
    */
   get accuracy() {
     return this._BHTs.reduce(
@@ -151,8 +180,9 @@ class History {
         `got ${typeof value} instead`
       );
     const v = value ? 1 : 0;
-    this._history.shift();
     this._history.push(v);
+
+    if (this._history.length > this._m) this._history.shift();
   }
 
   /**

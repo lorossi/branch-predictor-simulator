@@ -156,6 +156,7 @@ class CPU {
       this.pc++;
     } else if (this._ju.operations.includes(opcode)) {
       // jumps
+      const jump_pc = this.pc;
       const prediction = this._cbp.predict(this.pc);
       const outcome = this._ju.run(opcode, op1, op2, op3);
 
@@ -171,7 +172,7 @@ class CPU {
       this._last_outcome = outcome;
       this._last_branch_address = this.pc;
 
-      this._cbp.update(this.pc, outcome);
+      this._cbp.update(jump_pc, outcome);
     } else {
       throw new Error(`Operation ${opcode} not found`);
     }
