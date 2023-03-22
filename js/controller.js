@@ -111,9 +111,9 @@ class Controller {
   }
 
   _getModelValues() {
-    const k = document.querySelector("#bht_k").value;
-    const n = document.querySelector("#cbp_n").value;
-    const m = document.querySelector("#cbp_m").value;
+    const k = parseInt(document.querySelector("#bht_k").value);
+    const n = parseInt(document.querySelector("#cbp_n").value);
+    const m = parseInt(document.querySelector("#cbp_m").value);
     return [k, n, m];
   }
 
