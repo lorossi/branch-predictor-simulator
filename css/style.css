@@ -32,11 +32,11 @@ body {
 }
 
 .container > div:nth-child(1) {
-  width: 60%;
+  width: 65%;
 }
 
 .container > div:nth-child(2) {
-  width: 15%;
+  width: 10%;
 }
 
 .container > div:nth-child(3) {
