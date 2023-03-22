@@ -4,7 +4,7 @@ This is a simple simulation of a MIPS cpu with a correlating branch predictor, w
 
 The cpu supports a limited set of the MIPS instructions (currently the subroutine calls are not supported).
 
-Try it here: [branch-predictor](https://lorossi.github.io/branch-predictor/)
+Try it here: [branch-predictor](https://lorossi.github.io/branch-predictor-simulator/)
 
 
 ## Supported instructions
