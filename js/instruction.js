@@ -91,7 +91,9 @@ class Instruction {
    */
   static _matchLwSw(str) {
     const match =
-      /(lw|sw)\s([$a-zA-Z_0-9]+),\s([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(str);
+      /(lw|sw|LW|SW)\s([$a-zA-Z_0-9]+),\s([0-9]*)?\(([$a-zA-Z0-9]+)\)/.exec(
+        str
+      );
     if (match) return new Instruction(match[1], match[2], match[3], match[4]);
 
     return null;
