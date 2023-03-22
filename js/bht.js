@@ -51,7 +51,7 @@ class BHT {
    */
   _setPrediction(address, outcome) {
     const prediction = this._getPrediction(address);
-    let new_value = prediction + outcome;
+    let new_value = prediction + (outcome ? 1 : -1);
 
     if (new_value > this._n) new_value = this._n;
     else if (new_value < 0) new_value = 0;
@@ -99,7 +99,7 @@ class BHT {
 
     const key = this._correctAddressLength(address);
     const value = this._toBool(this._getPrediction(key));
-    const new_value = outcome ? value + 1 : value - 1;
+    const new_value = value + (outcome ? 1 : -1);
 
     if (value === outcome) this._correct++;
     else this._incorrect++;
