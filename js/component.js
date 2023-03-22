@@ -519,12 +519,12 @@ class SC extends Unit {
 
   _print_int() {
     const i = this._registers.get("$a0");
-    console.log(`$v0 = ${i}`);
+    console.log(`$a0 = ${i}`);
   }
 
   _print_char() {
     const c = this._registers.get("$a0");
-    console.log(`$v0 = ${string.fromCharCode(c)}`);
+    console.log(`$a0 = ${string.fromCharCode(c)}`);
   }
 
   _read_int() {
