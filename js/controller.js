@@ -5,6 +5,11 @@ class Controller {
   constructor() {
     this._model = null;
     this._view = null;
+    this._auto_run_interval = null;
+    this._is_auto_run = false;
+
+    this._auto_run_selector = document.querySelector("#auto_run");
+    this._auto_speed_selector = document.querySelector("#auto_speed");
 
     document
       .querySelector("#run_one")
@@ -23,6 +28,14 @@ class Controller {
       .forEach((element) =>
         element.addEventListener("click", this.reset.bind(this))
       );
+
+    this._auto_run_selector.addEventListener("click", this.autoRun.bind(this));
+    this._auto_speed_selector.addEventListener("change", () => {
+      if (this._is_auto_run) {
+        this._stopAutoRun();
+        this._startAutoRun();
+      }
+    });
 
     document
       .querySelector("#upload_code_button")
@@ -100,6 +113,32 @@ class Controller {
     this._updateView();
   }
 
+  autoRun() {
+    if (this._is_auto_run) {
+      this._stopAutoRun();
+      this._is_auto_run = false;
+      this._auto_run_selector.innerHTML = "Auto Run";
+    } else {
+      console.log(this._getAutoRunDelay());
+      this._startAutoRun();
+      this._is_auto_run = true;
+      this._auto_run_selector.innerHTML = "Stop";
+    }
+  }
+
+  _startAutoRun() {
+    const delay = this._getAutoRunDelay();
+    this._auto_run_interval = setInterval(() => {
+      this._model.runOne();
+      this._updateView();
+    }, delay);
+  }
+
+  _stopAutoRun() {
+    clearInterval(this._auto_run_interval);
+    this._auto_run_interval = null;
+  }
+
   /**
    * Update the view with the current state of the model.
    * @private
@@ -120,6 +159,11 @@ class Controller {
   _setModelValues(n, k, m) {
     this._model.setCBP(n, k, m);
     this.reset();
+  }
+
+  _getAutoRunDelay() {
+    const v = parseInt(this._auto_speed_selector.value);
+    return this._auto_speed_selector.attributes.max.value - v + 1;
   }
 }
 
