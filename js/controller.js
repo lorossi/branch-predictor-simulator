@@ -119,7 +119,6 @@ class Controller {
       this._is_auto_run = false;
       this._auto_run_selector.innerHTML = "Auto Run";
     } else {
-      console.log(this._getAutoRunDelay());
       this._startAutoRun();
       this._is_auto_run = true;
       this._auto_run_selector.innerHTML = "Stop";
